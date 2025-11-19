@@ -233,7 +233,14 @@ const SkillsGenerator: React.FC<SkillsGeneratorProps> = ({ onComplete, sharedDat
               {generatorOutput.projects.slice(0, 2).map((project, index) => (
                 <div key={index}>
                   <strong>{project.projectName}</strong>
-                  <p>{project.newProjectInfo.substring(0, 100)}...</p>
+                  <p>
+                    {project.projectPoints && project.projectPoints.length > 0 
+                      ? project.projectPoints[0].substring(0, 100) + '...'
+                      : project.newProjectInfo 
+                        ? project.newProjectInfo.substring(0, 100) + '...'
+                        : 'No content available'
+                    }
+                  </p>
                 </div>
               ))}
             </div>

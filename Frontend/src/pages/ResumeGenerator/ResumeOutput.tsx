@@ -64,20 +64,50 @@ const ResumeOutput: React.FC = () => {
     if (projects.length > 0) {
       html += `<h2 style="font-size: 14px; font-weight: bold; margin-bottom: 8px; margin-top: 16px;">PROJECTS</h2>`;
       projects.forEach(project => {
-        html += `
-          <p style="margin-bottom: 8px; font-size: 10px; font-weight: bold;">${project.projectName}</p>
-          <p style="margin-bottom: 12px; font-size: 10px;">${project.newProjectInfo}</p>
-        `;
+        html += `<p style="margin-bottom: 8px; font-size: 10px; font-weight: bold;">${project.projectName}</p>`;
+        
+        // Handle new project points format
+        if (project.projectPoints && project.projectPoints.length > 0) {
+          html += `<ul style="margin-bottom: 8px; padding-left: 16px;">`;
+          project.projectPoints.forEach(point => {
+            html += `<li style="font-size: 10px; margin-bottom: 4px;">${point}</li>`;
+          });
+          html += `</ul>`;
+        } else if (project.newProjectInfo) {
+          // Fallback to old format
+          html += `<p style="margin-bottom: 8px; font-size: 10px;">${project.newProjectInfo}</p>`;
+        }
+        
+        // Add project skills if available
+        if (project.projectSkills && project.projectSkills.length > 0) {
+          html += `<p style="margin-bottom: 12px; font-size: 9px; font-style: italic; color: #666;">Skills: ${project.projectSkills.join(' • ')}</p>`;
+        } else {
+          html += `<br/>`;
+        }
       });
     }
 
-    // Skills Section - Handle category format
-    if (Object.keys(skills).length > 0) {
+    // Skills Section - Handle category format and include project skills
+    const allSkills: string[] = [];
+    
+    // Add skills from generated categories
+    Object.values(skills).forEach(categorySkills => {
+      allSkills.push(...categorySkills);
+    });
+    
+    // Add project skills that aren't already included
+    projects.forEach(project => {
+      if (project.projectSkills) {
+        project.projectSkills.forEach(skill => {
+          if (!allSkills.includes(skill)) {
+            allSkills.push(skill);
+          }
+        });
+      }
+    });
+    
+    if (allSkills.length > 0) {
       html += `<h2 style="font-size: 14px; font-weight: bold; margin-bottom: 8px; margin-top: 16px;">TECHNICAL SKILLS</h2>`;
-      const allSkills: string[] = [];
-      Object.values(skills).forEach(categorySkills => {
-        allSkills.push(...categorySkills);
-      });
       html += `<p style="margin-bottom: 12px; font-size: 10px;">${allSkills.join(' • ')}</p>`;
     }
 

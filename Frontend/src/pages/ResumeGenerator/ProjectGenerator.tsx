@@ -30,6 +30,8 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number>(-1);
   const [editingProject, setEditingProject] = useState<GeneratedProject | null>(null);
+  const [editingProjectPoints, setEditingProjectPoints] = useState<string[]>([]);
+  const [editingProjectSkills, setEditingProjectSkills] = useState<string[]>([]);
 
   useEffect(() => {
     loadProjects();
@@ -55,7 +57,8 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
     // Use original projects as the new version
     const skippedProjects: GeneratedProject[] = projects.map(project => ({
       projectName: project.projectName,
-      newProjectInfo: `${project.projectInfo} Skills used: ${project.skills.map(s => s.skillName).join(', ')}`
+      projectPoints: [project.projectInfo], // Convert single info to array
+      projectSkills: project.skills.map(s => s.skillName)
     }));
     
     setGeneratedProjects(skippedProjects);
@@ -82,7 +85,8 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
       // Transform the API response to the frontend format
       const transformedProjects: GeneratedProject[] = response.output.map(item => ({
         projectName: item.project_name,
-        newProjectInfo: item.project_points.join(' ')
+        projectPoints: item.project_points,
+        projectSkills: item.project_skills
       }));
 
       setGeneratedProjects(transformedProjects);
@@ -101,27 +105,68 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
   };
 
   const handleEdit = (index: number) => {
+    const project = generatedProjects[index];
     setEditingIndex(index);
-    setEditingProject({ ...generatedProjects[index] });
+    setEditingProject({ ...project });
+    setEditingProjectPoints([...(project.projectPoints || [])]);
+    setEditingProjectSkills([...(project.projectSkills || [])]);
     setIsEditing(true);
   };
 
   const handleSaveEdit = () => {
     if (editingProject && editingIndex >= 0) {
       const updated = [...generatedProjects];
-      updated[editingIndex] = editingProject;
+      updated[editingIndex] = {
+        ...editingProject,
+        projectPoints: editingProjectPoints,
+        projectSkills: editingProjectSkills
+      };
       setGeneratedProjects(updated);
       setGeneratorOutput(prev => ({ ...prev, projects: updated }));
     }
     setIsEditing(false);
     setEditingIndex(-1);
     setEditingProject(null);
+    setEditingProjectPoints([]);
+    setEditingProjectSkills([]);
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditingIndex(-1);
     setEditingProject(null);
+    setEditingProjectPoints([]);
+    setEditingProjectSkills([]);
+  };
+
+  const handleUpdateProjectPoint = (pointIndex: number, value: string) => {
+    const updated = [...editingProjectPoints];
+    updated[pointIndex] = value;
+    setEditingProjectPoints(updated);
+  };
+
+  const handleAddProjectPoint = () => {
+    setEditingProjectPoints([...editingProjectPoints, '']);
+  };
+
+  const handleRemoveProjectPoint = (pointIndex: number) => {
+    const updated = editingProjectPoints.filter((_, index) => index !== pointIndex);
+    setEditingProjectPoints(updated);
+  };
+
+  const handleUpdateProjectSkill = (skillIndex: number, value: string) => {
+    const updated = [...editingProjectSkills];
+    updated[skillIndex] = value;
+    setEditingProjectSkills(updated);
+  };
+
+  const handleAddProjectSkill = () => {
+    setEditingProjectSkills([...editingProjectSkills, '']);
+  };
+
+  const handleRemoveProjectSkill = (skillIndex: number) => {
+    const updated = editingProjectSkills.filter((_, index) => index !== skillIndex);
+    setEditingProjectSkills(updated);
   };
 
   if (loading) {
@@ -257,7 +302,7 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
               <div className={styles.editContainer}>
                 <h4>Editing: {editingProject.projectName}</h4>
                 <div className={styles.section} style={{ marginTop: '1rem' }}>
-                  <label className={styles.infoLabel}>Project Name:</label>
+                  <label className={styles.pointsLabel}>Project Name:</label>
                   <input
                     type="text"
                     value={editingProject.projectName}
@@ -269,16 +314,61 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
                   />
                 </div>
                 <div className={styles.section} style={{ marginTop: '1rem' }}>
-                  <label className={styles.infoLabel}>Project Info:</label>
-                  <textarea
-                    value={editingProject.newProjectInfo}
-                    onChange={(e) => setEditingProject({
-                      ...editingProject,
-                      newProjectInfo: e.target.value
-                    })}
-                    className={styles.textarea}
-                    rows={12}
-                  />
+                  <label className={styles.pointsLabel}>Project Points:</label>
+                  {editingProjectPoints.map((point, pointIndex) => (
+                    <div key={pointIndex} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'flex-start' }}>
+                      <textarea
+                        value={point}
+                        onChange={(e) => handleUpdateProjectPoint(pointIndex, e.target.value)}
+                        className={styles.textarea}
+                        rows={2}
+                        style={{ flex: 1 }}
+                      />
+                      <button
+                        onClick={() => handleRemoveProjectPoint(pointIndex)}
+                        className={styles.deleteButton}
+                        style={{ padding: '0.5rem', marginTop: '0.25rem' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={handleAddProjectPoint}
+                    className={styles.addButton}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    + Add Project Point
+                  </button>
+                </div>
+                <div className={styles.section} style={{ marginTop: '1rem' }}>
+                  <label className={styles.pointsLabel}>Project Skills:</label>
+                  {editingProjectSkills.map((skill, skillIndex) => (
+                    <div key={skillIndex} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        value={skill}
+                        onChange={(e) => handleUpdateProjectSkill(skillIndex, e.target.value)}
+                        className={styles.input}
+                        style={{ flex: 1 }}
+                        placeholder="Enter skill name"
+                      />
+                      <button
+                        onClick={() => handleRemoveProjectSkill(skillIndex)}
+                        className={styles.deleteButton}
+                        style={{ padding: '0.5rem' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={handleAddProjectSkill}
+                    className={styles.addButton}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    + Add Project Skill
+                  </button>
                 </div>
                 <div className={styles.editActions}>
                   <button onClick={handleSaveEdit} className={styles.saveButton}>
@@ -302,10 +392,33 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
                       ✏️ Edit
                     </button>
                   </div>
-                  <div className={styles.projectInfo}>
-                    <p className={styles.infoLabel}>New Project Info:</p>
-                    <p className={styles.infoText}>{project.newProjectInfo}</p>
-                  </div>
+                  {project.projectPoints && project.projectPoints.length > 0 ? (
+                    <div className={styles.projectPoints}>
+                      <p className={styles.pointsLabel}>Project Points:</p>
+                      <ul className={styles.bulletList}>
+                        {project.projectPoints.map((point, pointIndex) => (
+                          <li key={pointIndex}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : project.newProjectInfo ? (
+                    <div className={styles.projectInfo}>
+                      <p className={styles.infoLabel}>Project Info:</p>
+                      <p className={styles.infoText}>{project.newProjectInfo}</p>
+                    </div>
+                  ) : null}
+                  {project.projectSkills && project.projectSkills.length > 0 && (
+                    <div className={styles.projectSkills} style={{ marginTop: '0.75rem' }}>
+                      <p className={styles.pointsLabel}>Project Skills:</p>
+                      <div className={styles.skills}>
+                        {project.projectSkills.map((skill, skillIndex) => (
+                          <span key={skillIndex} className={styles.skillTag}>
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}

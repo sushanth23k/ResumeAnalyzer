@@ -85,7 +85,9 @@ export interface GeneratedExperience {
 
 export interface GeneratedProject {
   projectName: string;
-  newProjectInfo: string;
+  newProjectInfo?: string; // Keep for backward compatibility
+  projectPoints?: string[]; // New format with array of points
+  projectSkills?: string[]; // Skills associated with the project
 }
 
 export interface SkillsByCategory {

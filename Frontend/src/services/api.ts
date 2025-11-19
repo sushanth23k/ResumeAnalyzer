@@ -446,7 +446,7 @@ export const completeInfoApi = {
 // ============================================
 
 // Experience Generator API
-export const ANALYZER_BASE_URL = `${BackendURL}/analyzer/`;
+export const ANALYZER_BASE_URL = `${BackendURL}analyzer`;
 export interface ExperienceGeneratorRequest {
   job_role: string;
   job_description: string;
