@@ -1,0 +1,103 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.editorContainer {
+  flex: 1;
+  margin-bottom: 2rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  min-height: 500px;
+}
+
+.editor {
+  height: 500px;
+}
+
+.downloadButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.downloadButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 200px;
+}
+
+.downloadButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.downloadButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .header h2 {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .header p {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .editorContainer {
+    border-color: #334155;
+    background: #0f172a;
+  }
+}
+
+@media (max-width: 768px) {
+  .downloadButtons {
+    flex-direction: column;
+  }
+
+  .downloadButton {
+    width: 100%;
+  }
+
+  .editorContainer {
+    min-height: 400px;
+  }
+
+  .editor {
+    height: 400px;
+  }
+}
+

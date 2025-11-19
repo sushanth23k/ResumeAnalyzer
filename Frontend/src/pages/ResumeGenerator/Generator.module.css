@@ -1,0 +1,539 @@
+.generator {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.section h3 {
+  margin: 0 0 0.75rem 0;
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.experienceList,
+.projectList {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.experienceItem,
+.projectItem {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.experienceItem h4,
+.projectItem h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+.date {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.description {
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.skillTag {
+  background: #667eea;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.skillsDisplay {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.textarea,
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.textarea:focus,
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.readOnlyBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.readOnlyBox pre {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.readOnlyBox strong {
+  color: #1e293b;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.readOnlyBox p {
+  margin: 0 0 0.5rem 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.generateButton,
+.skipButton,
+.nextButton {
+  flex: 1;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.generateButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.generateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.skipButton {
+  background: #94a3b8;
+  color: white;
+}
+
+.skipButton:hover:not(:disabled) {
+  background: #64748b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.4);
+}
+
+.skipButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nextButton {
+  background: #10b981;
+  color: white;
+  margin-top: 1rem;
+}
+
+.nextButton:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.output {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.output h3 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+}
+
+.companySection,
+.projectSection {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.companyName,
+.projectName {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.experiencePoints,
+.projectInfo {
+  margin-top: 0.75rem;
+}
+
+.pointsLabel,
+.infoLabel {
+  margin: 0 0 0.5rem 0;
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.bulletList {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #475569;
+}
+
+.bulletList li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.infoText {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.skillsList {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.skillsList ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  columns: 2;
+  column-gap: 2rem;
+}
+
+.skillsList li {
+  margin-bottom: 0.5rem;
+  color: #475569;
+}
+
+.empty {
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1.2rem;
+}
+
+.error {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error p {
+  margin: 0;
+}
+
+.retryButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retryButton:hover {
+  background: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  .generator {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .header {
+    border-bottom-color: #334155;
+  }
+
+  .header h2 {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .header p {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .section h3 {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .experienceItem,
+  .projectItem,
+  .skillsDisplay,
+  .readOnlyBox,
+  .companySection,
+  .projectSection,
+  .skillsList {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .experienceItem h4,
+  .projectItem h4,
+  .output h3,
+  .companyName,
+  .projectName {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .date,
+  .description,
+  .readOnlyBox pre,
+  .readOnlyBox p,
+  .pointsLabel,
+  .infoLabel,
+  .bulletList,
+  .bulletList li,
+  .infoText,
+  .skillsList li {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .readOnlyBox strong {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .textarea,
+  .input {
+    background: #0f172a;
+    border-color: #475569;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .empty {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .generator {
+    padding: 1.5rem;
+  }
+
+  .header h2 {
+    font-size: 1.3rem;
+  }
+
+  .experienceList,
+  .projectList {
+    max-height: 200px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .skillsList ul {
+    columns: 1;
+  }
+}
+
+.editContainer {
+  background: #f8fafc;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.editContainer h4 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+}
+
+.editActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.saveButton,
+.cancelButton,
+.editButton,
+.addButton,
+.deleteButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveButton {
+  background: #10b981;
+  color: white;
+}
+
+.saveButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.cancelButton {
+  background: #94a3b8;
+  color: white;
+}
+
+.cancelButton:hover {
+  background: #64748b;
+}
+
+.editButton {
+  background: #667eea;
+  color: white;
+}
+
+.editButton:hover {
+  background: #5568d3;
+}
+
+.addButton {
+  background: #10b981;
+  color: white;
+}
+
+.addButton:hover {
+  background: #059669;
+}
+
+.deleteButton {
+  background: #ef4444;
+  color: white;
+}
+
+.deleteButton:hover {
+  background: #dc2626;
+}
+
+.editSkillsList {
+  margin-top: 1rem;
+}
+
+.categorySection {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skillsByCategory {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.removeSkillButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.2rem;
+  padding: 0;
+  margin-left: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.removeSkillButton:hover {
+  transform: scale(1.2);
+}

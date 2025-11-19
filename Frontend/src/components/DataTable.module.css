@@ -1,0 +1,512 @@
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.8rem;
+}
+
+.addButton {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.addButton:hover {
+  background: #5568d3;
+}
+
+.form {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.input,
+.select {
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.saveButton {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saveButton:hover {
+  background: #059669;
+}
+
+.cancelButton {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancelButton:hover {
+  background: #475569;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: #f1f5f9;
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table td:nth-child(6) {
+  white-space: normal;
+  max-width: 200px;
+}
+
+.table tbody tr {
+  transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.link {
+  color: #667eea;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #5568d3;
+  text-decoration: underline;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.editButton,
+.deleteButton {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+
+.editButton {
+  background: #3b82f6;
+  color: white;
+}
+
+.editButton:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.deleteButton {
+  background: #ef4444;
+  color: white;
+}
+
+.deleteButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem !important;
+  color: #64748b;
+  font-style: italic;
+}
+
+.errorBanner {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.resumeSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.resumeSectionLabel {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.resumeUploadArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resumeStatus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+}
+
+.resumeStatusText {
+  color: #15803d;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.resumeUploadControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.fileName {
+  color: #475569;
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.formRow {
+  margin-bottom: 1.5rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.resumeCell {
+  min-width: 200px;
+}
+
+.resumeActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.downloadButton {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.downloadButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.deleteResumeButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.deleteResumeButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.uploadSection {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileLabel {
+  background: #667eea;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fileLabel:hover {
+  background: #5568d3;
+}
+
+.uploadButton {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.uploadButton:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.uploadButton:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.notes {
+  max-width: 200px;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.resumeLabel {
+  color: #10b981;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.noResume {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: #1e293b;
+    border: 1px solid #334155;
+  }
+
+  .header h2 {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .form {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .input,
+  .select {
+    background: #1e293b;
+    border-color: #475569;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .resumeSection {
+    background: #1e293b;
+    border-color: #475569;
+  }
+
+  .resumeSectionLabel {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .resumeStatus {
+    background: #1e293b;
+    border-color: #475569;
+  }
+
+  .resumeStatusText {
+    color: #86efac;
+  }
+
+  .fileName {
+    background: #0f172a;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .table thead {
+    background: #0f172a;
+  }
+
+  .table th {
+    color: rgba(255, 255, 255, 0.6);
+    border-bottom-color: #334155;
+  }
+
+  .table td {
+    color: rgba(255, 255, 255, 0.87);
+    border-bottom-color: #334155;
+  }
+
+  .table tbody tr:hover {
+    background: #0f172a;
+  }
+
+  .emptyState {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tableWrapper {
+    overflow-x: scroll;
+  }
+
+  .table {
+    min-width: 800px;
+  }
+}
+

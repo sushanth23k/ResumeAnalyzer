@@ -1,0 +1,11 @@
+# Django Resume Analyzer Requirements
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# External Libraries
+pandas==2.3.3
+python-dotenv
+
+# AI Libraries
+groq>=0.35.0

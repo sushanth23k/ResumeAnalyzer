@@ -1,0 +1,166 @@
+.container {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  gap: 2rem;
+  min-height: calc(100vh - 200px);
+}
+
+.sidebar {
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.sidebar h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 1.5rem 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.navButton.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.navButton.completed:not(.active) {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.navButton.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.labelContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.label {
+  flex: 1;
+}
+
+.checkmark {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.content {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background: #1e293b;
+    border: 1px solid #334155;
+  }
+
+  .sidebar h2 {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .navButton {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .navButton:hover:not(:disabled) {
+    background: #0f172a;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .navButton.active {
+    background: #667eea;
+    color: white;
+  }
+
+  .navButton.completed:not(.active) {
+    background: #10b981;
+    color: white;
+  }
+
+  .content {
+    background: #1e293b;
+    border: 1px solid #334155;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: static;
+  }
+
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navButton {
+    flex: 1;
+    min-width: 150px;
+  }
+}

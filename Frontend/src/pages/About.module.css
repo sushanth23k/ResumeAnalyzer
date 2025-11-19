@@ -1,0 +1,139 @@
+.about {
+  width: 100%;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #646cff 0%, #535bf2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mission {
+  background-color: rgba(100, 108, 255, 0.1);
+  border-radius: 12px;
+  padding: 3rem;
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #646cff;
+}
+
+.missionText {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.team {
+  margin-top: 4rem;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.teamCard {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.teamCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(100, 108, 255, 0.2);
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #646cff 0%, #535bf2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: 0 auto 1.5rem;
+}
+
+.memberName {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.memberRole {
+  color: #646cff;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.memberBio {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: light) {
+  .description,
+  .missionText,
+  .memberBio {
+    color: rgba(33, 53, 71, 0.8);
+  }
+
+  .teamCard {
+    background-color: rgba(100, 108, 255, 0.05);
+    border-color: rgba(100, 108, 255, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .sectionTitle {
+    font-size: 2rem;
+  }
+
+  .description,
+  .missionText {
+    font-size: 1rem;
+  }
+
+  .mission {
+    padding: 2rem;
+  }
+
+  .teamGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
