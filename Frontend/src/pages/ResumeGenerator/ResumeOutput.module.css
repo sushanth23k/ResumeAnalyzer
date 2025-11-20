@@ -30,13 +30,199 @@
   margin-bottom: 2rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  overflow: hidden;
-  background: white;
+  overflow: auto;
+  background: white; /* White background to match resume */
   min-height: 500px;
 }
 
 .editor {
   height: 500px;
+}
+
+/* Resume Preview Styles - All using Times New Roman, 9pt, 1.15 line spacing */
+.resumePreview {
+  padding: 0.5in; /* Narrow margins */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  line-height: 1.15;
+  color: #000000;
+  background: white !important; /* Force white background for resume content */
+  max-width: 8.5in;
+  margin: 0 auto;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow for better visibility */
+}
+
+.resumePreview:focus {
+  outline: 2px solid #667eea;
+  outline-offset: -2px;
+}
+
+/* Name - Centered, bold, 9pt */
+.resumeName {
+  text-align: center;
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  font-weight: bold;
+  color: #000000;
+  line-height: 1.15;
+}
+
+/* Contact Info - Centered, 9pt */
+.resumeContact {
+  text-align: center;
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  color: #000000;
+  line-height: 1.15;
+}
+
+.linkedinLink {
+  color: #0000EE;
+  text-decoration: underline;
+}
+
+/* Section Headers - Blue, bold, 9pt with grid line */
+.sectionHeader {
+  margin-top: 6pt;
+  margin-bottom: 0;
+}
+
+.sectionHeader h2 {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  font-weight: bold;
+  color: #0000FF; /* Blue */
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.gridLine {
+  border-bottom: 1px solid #000000; /* Single black line */
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
+/* Line space below heading */
+.sectionHeader + * {
+  margin-top: 1.15em;
+}
+
+/* Education Entry */
+.educationEntry {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  line-height: 1.15;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Job Header */
+.jobHeader {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  line-height: 1.15;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Role Name - Purple */
+.roleName {
+  font-weight: bold;
+  color: #800080; /* Purple */
+}
+
+/* Date Field - Editable and Movable with spaces */
+.dateField {
+  cursor: text;
+  min-width: 120px;
+  display: inline-block;
+  text-align: right;
+  padding: 2px 4px;
+  margin-left: auto;
+  position: relative;
+  user-select: text;
+  white-space: pre-wrap; /* Allow wrapping but preserve spaces */
+  word-spacing: normal;
+  letter-spacing: normal;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  color: #000000;
+  background: transparent;
+}
+
+.dateField:hover {
+  background-color: #f0f0f0;
+  border-radius: 2px;
+}
+
+.dateField:focus {
+  outline: 1px solid #667eea;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.dateField::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: ew-resize;
+  background: transparent;
+}
+
+.dateField:hover::before {
+  background: rgba(102, 126, 234, 0.3);
+}
+
+/* Bullet Points - Start from line start with proper spacing */
+.bulletPoint {
+  margin: 0 0 3pt 0; /* No left indent - starts from line start */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  line-height: 1.15;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Bullet Symbol - Normal document bullets */
+.bulletSymbol {
+  font-size: 9pt; /* Same size as text for normal bullets */
+  font-weight: normal;
+  margin-right: 0.5em; /* Standard spacing between bullet and text */
+  display: inline-block;
+  vertical-align: baseline;
+  color: #000000;
+}
+
+/* Project Name */
+.projectName {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 9pt;
+  line-height: 1.15;
+}
+
+/* Bold text */
+.bold {
+  font-weight: bold;
+}
+
+/* General div spacing */
+.resumePreview > div {
+  margin-bottom: 3pt;
 }
 
 .downloadButtons {
@@ -79,7 +265,29 @@
 
   .editorContainer {
     border-color: #334155;
-    background: #0f172a;
+    background: white; /* Keep white background even in dark mode */
+  }
+
+  .resumePreview {
+    background: white !important; /* Force white background in dark mode */
+    color: #000000 !important; /* Force black text in dark mode */
+  }
+
+  /* Ensure all text elements maintain proper colors in dark mode */
+  .resumePreview * {
+    color: inherit !important;
+  }
+
+  .resumePreview .sectionHeader h2 {
+    color: #0000FF !important; /* Blue section headers */
+  }
+
+  .resumePreview .roleName {
+    color: #800080 !important; /* Purple role names */
+  }
+
+  .resumePreview .linkedinLink {
+    color: #0000EE !important; /* Blue LinkedIn link */
   }
 }
 
@@ -100,4 +308,3 @@
     height: 400px;
   }
 }
-
