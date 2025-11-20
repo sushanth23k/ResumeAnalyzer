@@ -14,4 +14,4 @@ export TMPDIR="/Volumes/SushanthSSD/Git_Projects/ResumeAnalyzer/Backend/.tmp"
 
 ## Code Push
 
-git add . && git commit -a -m "[Modifications]" && git push
+git add . && git commit -a -m "[Modifications] " && git push
