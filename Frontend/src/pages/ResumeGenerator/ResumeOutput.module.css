@@ -122,6 +122,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  width: 100%;
+}
+
+.educationEntry > span:first-child {
+  flex: 1;
+  min-width: 0; /* Allow text to wrap if needed */
 }
 
 /* Job Header */
@@ -134,6 +140,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  width: 100%;
+}
+
+.jobHeader > span:first-child {
+  flex: 1;
+  min-width: 0; /* Allow text to wrap if needed */
 }
 
 /* Role Name - Purple */
@@ -150,6 +162,7 @@
   text-align: right;
   padding: 2px 4px;
   margin-left: auto;
+  flex-shrink: 0; /* Prevent date from shrinking */
   position: relative;
   user-select: text;
   white-space: pre-wrap; /* Allow wrapping but preserve spaces */

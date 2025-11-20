@@ -7,7 +7,6 @@ import {
   Paragraph, 
   TextRun, 
   AlignmentType,
-  TabStopType,
   ExternalHyperlink,
   BorderStyle
 } from 'docx';
@@ -321,6 +320,16 @@ const ResumeOutput: React.FC = () => {
                       const dateContent = editedDates[dateIndex] || academic.graduationDate;
                       dateIndex++;
                       
+                      // Calculate spaces needed to push date to the right
+                      // Approximate: page width (7.5in = 540pt) - margins (1in = 72pt each side) = 396pt usable width
+                      // Each space is roughly 4pt at 9pt font, so we need about 50-80 spaces depending on text length
+                      const mainText = `${academic.collegeName} – ${academic.course}`;
+                      const estimatedMainTextWidth = mainText.length * 4.5; // Approximate width per character
+                      const availableWidth = 396; // Approximate usable width in points
+                      const dateWidth = dateContent.length * 4.5;
+                      const spacesNeeded = Math.max(1, Math.floor((availableWidth - estimatedMainTextWidth - dateWidth) / 4));
+                      const spacingText = ' '.repeat(Math.min(spacesNeeded, 100)); // Cap at 100 spaces
+                      
                       return [
                         new Paragraph({
                           children: [
@@ -329,17 +338,11 @@ const ResumeOutput: React.FC = () => {
                               ...boldTextStyle,
                             }),
                             new TextRun({
-                              text: `\t${dateContent}`, // Preserve spaces from editable content
+                              text: `${spacingText}${dateContent}`, // Use spaces instead of tab
                               ...bodyTextStyle,
                             }),
                           ],
                           alignment: AlignmentType.LEFT,
-                          tabStops: [
-                            {
-                              type: TabStopType.RIGHT,
-                              position: 9360, // Right align at right margin - adjustable
-                            },
-                          ],
                           spacing: {
                             after: SECTION_SPACING_AFTER,
                             line: LINE_SPACING,
@@ -383,6 +386,14 @@ const ResumeOutput: React.FC = () => {
                       const dateContent = editedDates[dateIndex] || defaultDate;
                       dateIndex++;
                       
+                      // Calculate spaces needed to push date to the right
+                      const mainText = `${originalExp?.role || 'Professional Role'} | ${exp.companyName} | ${(originalExp as any)?.location || 'Location'}`;
+                      const estimatedMainTextWidth = mainText.length * 4.5; // Approximate width per character
+                      const availableWidth = 396; // Approximate usable width in points
+                      const dateWidth = dateContent.length * 4.5;
+                      const spacesNeeded = Math.max(1, Math.floor((availableWidth - estimatedMainTextWidth - dateWidth) / 4));
+                      const spacingText = ' '.repeat(Math.min(spacesNeeded, 100)); // Cap at 100 spaces
+                      
                       return [
                         // Job Title | Company | Location | Dates (right-aligned)
                         new Paragraph({
@@ -404,40 +415,33 @@ const ResumeOutput: React.FC = () => {
                               ...bodyTextStyle,
                             }),
                             new TextRun({
-                              text: `\t${dateContent}`, // Preserve spaces from editable content
+                              text: `${spacingText}${dateContent}`, // Use spaces instead of tab
                               ...bodyTextStyle,
                             }),
                           ],
                           alignment: AlignmentType.LEFT,
-                          tabStops: [
-                            {
-                              type: TabStopType.RIGHT,
-                              position: 9360, // Right align at right margin - adjustable
-                            },
-                          ],
                           spacing: {
                             line: LINE_SPACING,
                           },
                         }),
-                        // Experience bullets - start from line start with proper spacing
+                        // Experience bullets - using proper Word bullet formatting with full justification
                         ...exp.newExperience.map(
                           point =>
                             new Paragraph({
                               children: [
                                 new TextRun({
-                                  text: '•',
-                                  ...bodyTextStyle,
-                                }),
-                                new TextRun({
-                                  text: ` ${point}`, // Space between bullet and text
+                                  text: point,
                                   ...bodyTextStyle,
                                 }),
                               ],
+                              bullet: {
+                                level: 0,
+                              },
+                              alignment: AlignmentType.JUSTIFIED,
                               spacing: {
                                 after: BULLET_SPACING_AFTER,
                                 line: LINE_SPACING,
                               },
-                              // No left indent - starts from line start
                             })
                         ),
                       ];
@@ -474,11 +478,7 @@ const ResumeOutput: React.FC = () => {
                       new Paragraph({
                         children: [
                           new TextRun({
-                            text: '•',
-                            ...bodyTextStyle,
-                          }),
-                          new TextRun({
-                            text: ` ${category}: `, // Space between bullet and text
+                            text: `${category}: `,
                             ...boldTextStyle,
                           }),
                           new TextRun({
@@ -486,12 +486,14 @@ const ResumeOutput: React.FC = () => {
                             ...bodyTextStyle,
                           }),
                         ],
+                        bullet: {
+                          level: 0,
+                        },
                         alignment: AlignmentType.LEFT,
                         spacing: {
                           after: BULLET_SPACING_AFTER,
                           line: LINE_SPACING,
                         },
-                        // No left indent - starts from line start
                       })
                     ),
                   ]
@@ -545,44 +547,42 @@ const ResumeOutput: React.FC = () => {
                             line: LINE_SPACING,
                           },
                         }),
-                        // Project bullets - start from line start with proper spacing
+                        // Project bullets - using proper Word bullet formatting with full justification
                         ...(project.projectPoints && project.projectPoints.length > 0
                           ? project.projectPoints.map(point =>
                               new Paragraph({
                                 children: [
                                   new TextRun({
-                                    text: '•',
-                                    ...bodyTextStyle,
-                                  }),
-                                  new TextRun({
-                                    text: ` ${point}`, // Space between bullet and text
+                                    text: point,
                                     ...bodyTextStyle,
                                   }),
                                 ],
+                                bullet: {
+                                  level: 0,
+                                },
+                                alignment: AlignmentType.JUSTIFIED,
                                 spacing: {
                                   after: BULLET_SPACING_AFTER,
                                   line: LINE_SPACING,
                                 },
-                                // No left indent - starts from line start
                               })
                             )
                           : project.newProjectInfo
                           ? [new Paragraph({
                               children: [
                                 new TextRun({
-                                  text: '•',
-                                  ...bodyTextStyle,
-                                }),
-                                new TextRun({
-                                  text: ` ${project.newProjectInfo}`, // Space between bullet and text
+                                  text: project.newProjectInfo,
                                   ...bodyTextStyle,
                                 }),
                               ],
+                              bullet: {
+                                level: 0,
+                              },
+                              alignment: AlignmentType.JUSTIFIED,
                               spacing: {
                                 after: BULLET_SPACING_AFTER,
                                 line: LINE_SPACING,
                               },
-                              // No left indent - starts from line start
                             })]
                           : []),
                       ];
@@ -608,6 +608,17 @@ const ResumeOutput: React.FC = () => {
     setIsDownloading(true);
     try {
       const { experiences, projects, skills } = generatorOutput;
+
+      // Extract date content with preserved spaces from editable content
+      const getAllDateContents = (element: HTMLElement | null): string[] => {
+        if (!element) return [];
+        const dateElements = element.querySelectorAll(`.${styles.dateField}`);
+        return Array.from(dateElements).map(el => el.textContent || '');
+      };
+      
+      // Get all edited date contents with preserved spaces
+      const editedDates = resumeRef.current ? getAllDateContents(resumeRef.current) : [];
+      let dateIndex = 0;
 
       const pdf = new jsPDF();
       // Narrow margins: 0.5 inch = 14.4mm (approximately)
@@ -662,7 +673,10 @@ const ResumeOutput: React.FC = () => {
           pdf.setFont('times', 'bold');
           pdf.text(`${academic.collegeName} – ${academic.course}`, margin, yPosition);
           pdf.setFont('times', 'normal');
-          pdf.text(academic.graduationDate, 190, yPosition, { align: 'right' });
+          // Use edited date content with preserved spaces
+          const dateContent = editedDates[dateIndex] || academic.graduationDate;
+          dateIndex++;
+          pdf.text(dateContent, pageWidth - margin, yPosition, { align: 'right' });
           yPosition += lineHeight + 2;
         });
         yPosition += 3;
@@ -695,21 +709,47 @@ const ResumeOutput: React.FC = () => {
           const companyLine = ` | ${exp.companyName} | ${(originalExp as any)?.location || 'Location'}`;
           pdf.text(companyLine, margin + pdf.getTextWidth(`${originalExp?.role || 'Professional Role'}`), yPosition);
           pdf.setFont('times', 'normal');
-          pdf.text(`${originalExp?.startDate || 'Start'} - ${originalExp?.endDate || 'End'}`, pdf.internal.pageSize.width - margin, yPosition, { align: 'right' });
+          // Use edited date content with preserved spaces
+          const defaultDate = `${originalExp?.startDate || 'Start'} - ${originalExp?.endDate || 'End'}`;
+          const dateContent = editedDates[dateIndex] || defaultDate;
+          dateIndex++;
+          pdf.text(dateContent, pageWidth - margin, yPosition, { align: 'right' });
           yPosition += lineHeight;
 
-          // Experience bullets - start from line start with proper spacing
+          // Experience bullets - using proper bullet formatting with indentation and justification
           pdf.setFont('times', 'normal');
           exp.newExperience.forEach(point => {
             checkPageBreak();
-            // Start from margin (line start), bullet symbol then space then text
-            const bulletText = `• ${point}`;
-            const lines = pdf.splitTextToSize(bulletText, pdf.internal.pageSize.width - margin * 2);
-            lines.forEach((line: string) => {
+            // Use bullet character and indent text properly
+            pdf.text('•', margin + 2, yPosition);
+            const textWidth = pageWidth - margin * 2 - 8;
+            const lines = pdf.splitTextToSize(point, textWidth);
+            lines.forEach((line: string, lineIndex: number) => {
               checkPageBreak();
-              pdf.text(line, margin, yPosition);
-              yPosition += lineHeight;
+              // Apply justification for multi-line text (except last line)
+              if (lineIndex < lines.length - 1 && line.trim().length > 0) {
+                // Justify text by adding extra spaces
+                const words = line.trim().split(' ');
+                if (words.length > 1) {
+                  const totalTextWidth = words.reduce((sum, word) => sum + pdf.getTextWidth(word), 0);
+                  const totalSpaces = words.length - 1;
+                  const extraSpace = (textWidth - totalTextWidth) / totalSpaces;
+                  let xPos = margin + 8;
+                  words.forEach((word, wordIndex) => {
+                    pdf.text(word, xPos, yPosition);
+                    if (wordIndex < words.length - 1) {
+                      xPos += pdf.getTextWidth(word) + pdf.getTextWidth(' ') + extraSpace;
+                    }
+                  });
+                } else {
+                  pdf.text(line, margin + 8, yPosition);
+                }
+              } else {
+                pdf.text(line, margin + 8, yPosition);
+              }
+              if (lineIndex < lines.length - 1) yPosition += lineHeight;
             });
+            yPosition += lineHeight;
           });
           yPosition += 3;
         });
@@ -733,14 +773,16 @@ const ResumeOutput: React.FC = () => {
         Object.entries(skills).forEach(([category, categorySkills]) => {
           checkPageBreak();
           pdf.setFont('times', 'normal');
-          // Start from margin (line start), bullet symbol then space then text
-          const skillText = `• ${category}: ${categorySkills.join(', ')}`;
-          const lines = pdf.splitTextToSize(skillText, pdf.internal.pageSize.width - margin * 2);
-          lines.forEach((line: string) => {
+          // Use bullet character and indent text properly
+          pdf.text('•', margin + 2, yPosition);
+          const skillText = `${category}: ${categorySkills.join(', ')}`;
+          const lines = pdf.splitTextToSize(skillText, pdf.internal.pageSize.width - margin * 2 - 8);
+          lines.forEach((line: string, lineIndex: number) => {
             checkPageBreak();
-            pdf.text(line, margin, yPosition);
-            yPosition += lineHeight;
+            pdf.text(line, margin + 8, yPosition);
+            if (lineIndex < lines.length - 1) yPosition += lineHeight;
           });
+          yPosition += lineHeight;
         });
         yPosition += 3;
       }
@@ -770,27 +812,71 @@ const ResumeOutput: React.FC = () => {
           pdf.text(projectTitle + skillsText, margin, yPosition);
           yPosition += lineHeight;
 
-          // Project bullets - start from line start with proper spacing
+          // Project bullets - using proper bullet formatting with indentation and justification
           if (project.projectPoints && project.projectPoints.length > 0) {
             project.projectPoints.forEach(point => {
               checkPageBreak();
-              // Start from margin (line start), bullet symbol then space then text
-              const bulletText = `• ${point}`;
-              const lines = pdf.splitTextToSize(bulletText, pdf.internal.pageSize.width - margin * 2);
-              lines.forEach((line: string) => {
+              // Use bullet character and indent text properly
+              pdf.text('•', margin + 2, yPosition);
+              const textWidth = pageWidth - margin * 2 - 8;
+              const lines = pdf.splitTextToSize(point, textWidth);
+              lines.forEach((line: string, lineIndex: number) => {
                 checkPageBreak();
-                pdf.text(line, margin, yPosition);
-                yPosition += lineHeight;
+                // Apply justification for multi-line text (except last line)
+                if (lineIndex < lines.length - 1 && line.trim().length > 0) {
+                  // Justify text by adding extra spaces
+                  const words = line.trim().split(' ');
+                  if (words.length > 1) {
+                    const totalTextWidth = words.reduce((sum, word) => sum + pdf.getTextWidth(word), 0);
+                    const totalSpaces = words.length - 1;
+                    const extraSpace = (textWidth - totalTextWidth) / totalSpaces;
+                    let xPos = margin + 8;
+                    words.forEach((word, wordIndex) => {
+                      pdf.text(word, xPos, yPosition);
+                      if (wordIndex < words.length - 1) {
+                        xPos += pdf.getTextWidth(word) + pdf.getTextWidth(' ') + extraSpace;
+                      }
+                    });
+                  } else {
+                    pdf.text(line, margin + 8, yPosition);
+                  }
+                } else {
+                  pdf.text(line, margin + 8, yPosition);
+                }
+                if (lineIndex < lines.length - 1) yPosition += lineHeight;
               });
-            });
-          } else if (project.newProjectInfo) {
-            const bulletText = `• ${project.newProjectInfo}`;
-            const lines = pdf.splitTextToSize(bulletText, pdf.internal.pageSize.width - margin * 2);
-            lines.forEach((line: string) => {
-              checkPageBreak();
-              pdf.text(line, margin, yPosition);
               yPosition += lineHeight;
             });
+          } else if (project.newProjectInfo) {
+            pdf.text('•', margin + 2, yPosition);
+            const textWidth = pageWidth - margin * 2 - 8;
+            const lines = pdf.splitTextToSize(project.newProjectInfo, textWidth);
+            lines.forEach((line: string, lineIndex: number) => {
+              checkPageBreak();
+              // Apply justification for multi-line text (except last line)
+              if (lineIndex < lines.length - 1 && line.trim().length > 0) {
+                // Justify text by adding extra spaces
+                const words = line.trim().split(' ');
+                if (words.length > 1) {
+                  const totalTextWidth = words.reduce((sum, word) => sum + pdf.getTextWidth(word), 0);
+                  const totalSpaces = words.length - 1;
+                  const extraSpace = (textWidth - totalTextWidth) / totalSpaces;
+                  let xPos = margin + 8;
+                  words.forEach((word, wordIndex) => {
+                    pdf.text(word, xPos, yPosition);
+                    if (wordIndex < words.length - 1) {
+                      xPos += pdf.getTextWidth(word) + pdf.getTextWidth(' ') + extraSpace;
+                    }
+                  });
+                } else {
+                  pdf.text(line, margin + 8, yPosition);
+                }
+              } else {
+                pdf.text(line, margin + 8, yPosition);
+              }
+              if (lineIndex < lines.length - 1) yPosition += lineHeight;
+            });
+            yPosition += lineHeight;
           }
           yPosition += 3;
         });
