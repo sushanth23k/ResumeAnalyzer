@@ -2,7 +2,7 @@
 // Base URL from App.tsx
 
 export const BackendURL = "http://127.0.0.1:8000/";
-export const API_BASE_URL = `${BackendURL}/api`;
+export const API_BASE_URL = `${BackendURL}api`;
 
 // Helper function to handle API responses
 async function handleResponse<T>(response: Response): Promise<T> {
