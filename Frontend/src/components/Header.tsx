@@ -1,37 +1,40 @@
-import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import styles from './Header.module.css'
+import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import styles from './Header.module.css';
 
-interface NavItem {
-  path: string
-  label: string
-}
+const Header: React.FC = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
 
-interface HeaderProps {
-  className?: string
-}
-
-const Header: React.FC<HeaderProps> = ({ className }) => {
-  const navItems: NavItem[] = [
+  const navItems = [
     { path: '/', label: 'Dashboard' },
     { path: '/applications', label: 'Applications' },
     { path: '/applicant-info', label: 'Applicant Info' },
-    { path: '/resume-generator', label: 'Resume Generator' }
-  ]
+    { path: '/resume-generator', label: 'Resume Generator' },
+  ];
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await logout();
+    navigate('/auth/login', { replace: true });
+  };
 
   return (
-    <header className={`${styles.header} ${className || ''}`}>
+    <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
           <Link to="/">Resume Analyzer</Link>
         </div>
+
         <nav className={styles.nav}>
           <ul className={styles.navList}>
-            {navItems.map((item) => (
+            {navItems.map(item => (
               <li key={item.path} className={styles.navItem}>
-                <NavLink 
-                  to={item.path} 
-                  className={({ isActive }) => 
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
                     `${styles.navLink} ${isActive ? styles.active : ''}`
                   }
                   end={item.path === '/'}
@@ -42,10 +45,25 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             ))}
           </ul>
         </nav>
+
+        <div className={styles.userArea}>
+          {user && (
+            <span className={styles.userEmail} title={user.email}>
+              {user.email}
+            </span>
+          )}
+          <button
+            className={styles.logoutBtn}
+            onClick={handleLogout}
+            disabled={loggingOut}
+            aria-label="Logout"
+          >
+            {loggingOut ? '…' : 'Logout'}
+          </button>
+        </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
-
+export default Header;

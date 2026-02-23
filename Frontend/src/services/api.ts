@@ -1,23 +1,18 @@
 // API Service for Resume Analyzer Backend
-// Base URL from App.tsx
+import { authFetch } from '../utils/apiClient';
 
-export const BackendURL = "http://127.0.0.1:8000/";
+export const BackendURL = 'http://127.0.0.1:8000/';
 export const API_BASE_URL = `${BackendURL}api`;
+export const ANALYZER_BASE_URL = `${BackendURL}analyzer`;
 
-// Helper function to handle API responses
+// Helper — expects { success, data } envelope
 async function handleResponse<T>(response: Response): Promise<T> {
   const data = await response.json();
-  
-  if (!data.success) {
-    throw new Error(data.error?.message || 'API request failed');
-  }
-  
+  if (!data.success) throw new Error(data.error?.message || 'API request failed');
   return data.data;
 }
 
-// ============================================
-// BASIC INFORMATION API
-// ============================================
+// ─── Basic Information ─────────────────────────────────────────────────────
 
 export interface BasicInfoData {
   id?: string;
@@ -31,24 +26,22 @@ export interface BasicInfoData {
 
 export const basicInfoApi = {
   get: async (): Promise<BasicInfoData | null> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/basic`);
-    const data = await response.json();
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/basic`);
+    const data = await res.json();
     return data.success ? data.data : null;
   },
 
-  save: async (data: BasicInfoData): Promise<BasicInfoData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/basic`, {
+  save: async (info: BasicInfoData): Promise<BasicInfoData> => {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/basic`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(info),
     });
-    return handleResponse<BasicInfoData>(response);
+    return handleResponse<BasicInfoData>(res);
   },
 };
 
-// ============================================
-// ACADEMICS API
-// ============================================
+// ─── Academics ─────────────────────────────────────────────────────────────
 
 export interface AcademicData {
   id?: string;
@@ -60,41 +53,39 @@ export interface AcademicData {
 
 export const academicsApi = {
   getAll: async (): Promise<AcademicData[]> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/academics`);
-    return handleResponse<AcademicData[]>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/academics`);
+    return handleResponse<AcademicData[]>(res);
   },
 
   create: async (data: Omit<AcademicData, 'id'>): Promise<AcademicData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/academics`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/academics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...data }),
     });
-    return handleResponse<AcademicData>(response);
+    return handleResponse<AcademicData>(res);
   },
 
   update: async (id: string, data: Partial<AcademicData>): Promise<AcademicData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/academics`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/academics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update', id, ...data }),
     });
-    return handleResponse<AcademicData>(response);
+    return handleResponse<AcademicData>(res);
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/academics`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/academics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// ACHIEVEMENTS API
-// ============================================
+// ─── Achievements ──────────────────────────────────────────────────────────
 
 export interface AchievementData {
   id?: string;
@@ -104,41 +95,39 @@ export interface AchievementData {
 
 export const achievementsApi = {
   getAll: async (): Promise<AchievementData[]> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/achievements`);
-    return handleResponse<AchievementData[]>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/achievements`);
+    return handleResponse<AchievementData[]>(res);
   },
 
   create: async (data: Omit<AchievementData, 'id'>): Promise<AchievementData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/achievements`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/achievements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...data }),
     });
-    return handleResponse<AchievementData>(response);
+    return handleResponse<AchievementData>(res);
   },
 
   update: async (id: string, data: Partial<AchievementData>): Promise<AchievementData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/achievements`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/achievements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update', id, ...data }),
     });
-    return handleResponse<AchievementData>(response);
+    return handleResponse<AchievementData>(res);
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/achievements`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/achievements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// SKILLS API
-// ============================================
+// ─── Skills ────────────────────────────────────────────────────────────────
 
 export interface SkillData {
   id: string;
@@ -151,48 +140,45 @@ export const skillsApi = {
     const params = new URLSearchParams();
     if (category) params.append('category', category);
     if (search) params.append('search', search);
-    
     const url = `${API_BASE_URL}/skills${params.toString() ? '?' + params : ''}`;
-    const response = await fetch(url);
-    return handleResponse<SkillData[]>(response);
+    const res = await authFetch(url);
+    return handleResponse<SkillData[]>(res);
   },
 
   create: async (skillName: string, category: string): Promise<SkillData> => {
-    const response = await fetch(`${API_BASE_URL}/skills`, {
+    const res = await authFetch(`${API_BASE_URL}/skills`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillName, category }),
     });
-    return handleResponse<SkillData>(response);
+    return handleResponse<SkillData>(res);
   },
 
   getUserSkills: async (): Promise<SkillData[]> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/skills`);
-    return handleResponse<SkillData[]>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/skills`);
+    return handleResponse<SkillData[]>(res);
   },
 
   addUserSkills: async (skillIds: string[]): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/skills`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/skills`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'add', skillIds }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 
   removeUserSkills: async (skillIds: string[]): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/skills`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/skills`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'remove', skillIds }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// PROJECTS API
-// ============================================
+// ─── Projects ──────────────────────────────────────────────────────────────
 
 export interface ProjectData {
   id: string;
@@ -204,41 +190,52 @@ export interface ProjectData {
 
 export const projectsApi = {
   getAll: async (): Promise<ProjectData[]> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/projects`);
-    return handleResponse<ProjectData[]>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/projects`);
+    return handleResponse<ProjectData[]>(res);
   },
 
-  create: async (data: { projectName: string; projectInfo: string; skillIds: string[]; displayOrder: number }): Promise<ProjectData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/projects`, {
+  create: async (data: {
+    projectName: string;
+    projectInfo: string;
+    skillIds: string[];
+    displayOrder: number;
+  }): Promise<ProjectData> => {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/projects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...data }),
     });
-    return handleResponse<ProjectData>(response);
+    return handleResponse<ProjectData>(res);
   },
 
-  update: async (id: string, data: Partial<{ projectName: string; projectInfo: string; skillIds: string[]; displayOrder: number }>): Promise<ProjectData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/projects`, {
+  update: async (
+    id: string,
+    data: Partial<{
+      projectName: string;
+      projectInfo: string;
+      skillIds: string[];
+      displayOrder: number;
+    }>,
+  ): Promise<ProjectData> => {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/projects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update', id, ...data }),
     });
-    return handleResponse<ProjectData>(response);
+    return handleResponse<ProjectData>(res);
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/projects`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/projects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// EXPERIENCES API
-// ============================================
+// ─── Experiences ───────────────────────────────────────────────────────────
 
 export interface ExperienceData {
   id: string;
@@ -253,41 +250,39 @@ export interface ExperienceData {
 
 export const experiencesApi = {
   getAll: async (): Promise<ExperienceData[]> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/experiences`);
-    return handleResponse<ExperienceData[]>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/experiences`);
+    return handleResponse<ExperienceData[]>(res);
   },
 
   create: async (data: Omit<ExperienceData, 'id'>): Promise<ExperienceData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/experiences`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/experiences`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...data }),
     });
-    return handleResponse<ExperienceData>(response);
+    return handleResponse<ExperienceData>(res);
   },
 
   update: async (id: string, data: Partial<ExperienceData>): Promise<ExperienceData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/experiences`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/experiences`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update', id, ...data }),
     });
-    return handleResponse<ExperienceData>(response);
+    return handleResponse<ExperienceData>(res);
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/experiences`, {
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/experiences`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// APPLICATIONS API
-// ============================================
+// ─── Applications ──────────────────────────────────────────────────────────
 
 export interface ApplicationData {
   id: string;
@@ -306,48 +301,48 @@ export const applicationsApi = {
     limit?: number;
     offset?: number;
   }): Promise<{ applications: ApplicationData[]; total: number; page: number; limit: number }> => {
-    const searchParams = new URLSearchParams();
-    if (params?.status) searchParams.append('status', params.status);
-    if (params?.company) searchParams.append('company', params.company);
-    if (params?.limit) searchParams.append('limit', params.limit.toString());
-    if (params?.offset) searchParams.append('offset', params.offset.toString());
-
-    const url = `${API_BASE_URL}/applications${searchParams.toString() ? '?' + searchParams : ''}`;
-    const response = await fetch(url);
-    return handleResponse<{ applications: ApplicationData[]; total: number; page: number; limit: number }>(response);
+    const sp = new URLSearchParams();
+    if (params?.status) sp.append('status', params.status);
+    if (params?.company) sp.append('company', params.company);
+    if (params?.limit) sp.append('limit', params.limit.toString());
+    if (params?.offset) sp.append('offset', params.offset.toString());
+    const url = `${API_BASE_URL}/applications${sp.toString() ? '?' + sp : ''}`;
+    const res = await authFetch(url);
+    return handleResponse<{ applications: ApplicationData[]; total: number; page: number; limit: number }>(res);
   },
 
   create: async (data: Omit<ApplicationData, 'id' | 'resumeFilePath'>): Promise<ApplicationData> => {
-    const response = await fetch(`${API_BASE_URL}/applications`, {
+    const res = await authFetch(`${API_BASE_URL}/applications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...data }),
     });
-    return handleResponse<ApplicationData>(response);
+    return handleResponse<ApplicationData>(res);
   },
 
-  update: async (id: string, data: Partial<Omit<ApplicationData, 'id' | 'resumeFilePath'>>): Promise<ApplicationData> => {
-    const response = await fetch(`${API_BASE_URL}/applications`, {
+  update: async (
+    id: string,
+    data: Partial<Omit<ApplicationData, 'id' | 'resumeFilePath'>>,
+  ): Promise<ApplicationData> => {
+    const res = await authFetch(`${API_BASE_URL}/applications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update', id, ...data }),
     });
-    return handleResponse<ApplicationData>(response);
+    return handleResponse<ApplicationData>(res);
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/applications`, {
+    const res = await authFetch(`${API_BASE_URL}/applications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id }),
     });
-    await handleResponse<void>(response);
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// RESUME FILE MANAGEMENT API
-// ============================================
+// ─── Resume File ───────────────────────────────────────────────────────────
 
 export interface ResumeFileData {
   resumeFilePath: string;
@@ -362,38 +357,26 @@ export const resumeFileApi = {
     formData.append('action', 'upload');
     formData.append('id', applicationId);
     formData.append('file', file);
-
-    const response = await fetch(`${API_BASE_URL}/resume`, {
-      method: 'POST',
-      body: formData,
-    });
-    return handleResponse<ResumeFileData>(response);
+    const res = await authFetch(`${API_BASE_URL}/resume`, { method: 'POST', body: formData });
+    return handleResponse<ResumeFileData>(res);
   },
 
   download: async (applicationId: string): Promise<Blob> => {
-    const response = await fetch(`${API_BASE_URL}/resume?id=${applicationId}`);
-    if (!response.ok) {
-      throw new Error('Failed to download resume');
-    }
-    return await response.blob();
+    const res = await authFetch(`${API_BASE_URL}/resume?id=${applicationId}`);
+    if (!res.ok) throw new Error('Failed to download resume');
+    return res.blob();
   },
 
   delete: async (applicationId: string): Promise<void> => {
     const formData = new FormData();
     formData.append('action', 'delete');
     formData.append('id', applicationId);
-
-    const response = await fetch(`${API_BASE_URL}/resume`, {
-      method: 'POST',
-      body: formData,
-    });
-    await handleResponse<void>(response);
+    const res = await authFetch(`${API_BASE_URL}/resume`, { method: 'POST', body: formData });
+    await handleResponse<void>(res);
   },
 };
 
-// ============================================
-// APPLICATION STATISTICS API
-// ============================================
+// ─── Application Stats ─────────────────────────────────────────────────────
 
 export interface ApplicationStatsData {
   total: number;
@@ -406,24 +389,17 @@ export interface ApplicationStatsData {
     Interview: number;
   };
   successRate: number;
-  recentApplications: Array<{
-    id: string;
-    jobName: string;
-    companyName: string;
-    status: string;
-  }>;
+  recentApplications: Array<{ id: string; jobName: string; companyName: string; status: string }>;
 }
 
 export const applicationStatsApi = {
   get: async (): Promise<ApplicationStatsData> => {
-    const response = await fetch(`${API_BASE_URL}/applications/stats`);
-    return handleResponse<ApplicationStatsData>(response);
+    const res = await authFetch(`${API_BASE_URL}/applications/stats`);
+    return handleResponse<ApplicationStatsData>(res);
   },
 };
 
-// ============================================
-// COMPLETE APPLICANT INFO API
-// ============================================
+// ─── Complete Info ─────────────────────────────────────────────────────────
 
 export interface CompleteApplicantInfoData {
   basicInformation: BasicInfoData | null;
@@ -436,17 +412,13 @@ export interface CompleteApplicantInfoData {
 
 export const completeInfoApi = {
   get: async (): Promise<CompleteApplicantInfoData> => {
-    const response = await fetch(`${API_BASE_URL}/applicant-info/complete`);
-    return handleResponse<CompleteApplicantInfoData>(response);
+    const res = await authFetch(`${API_BASE_URL}/applicant-info/complete`);
+    return handleResponse<CompleteApplicantInfoData>(res);
   },
 };
 
-// ============================================
-// RESUME GENERATOR APIs
-// ============================================
+// ─── AI Generator APIs ─────────────────────────────────────────────────────
 
-// Experience Generator API
-export const ANALYZER_BASE_URL = `${BackendURL}analyzer`;
 export interface ExperienceGeneratorRequest {
   job_role: string;
   job_description: string;
@@ -471,23 +443,17 @@ export interface ExperienceGeneratorResponse {
 
 export const experienceGeneratorApi = {
   generate: async (data: ExperienceGeneratorRequest): Promise<ExperienceGeneratorResponse> => {
-    const response = await fetch(`${ANALYZER_BASE_URL}/experience-gen`, {
+    const res = await authFetch(`${ANALYZER_BASE_URL}/experience-gen`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
-    const result = await response.json();
-    
-    if (!response.ok || result.status !== 'success') {
-      throw new Error(result.message || 'Experience generation failed');
-    }
-    
+    const result = await res.json();
+    if (!res.ok || result.status !== 'success') throw new Error(result.message || 'Experience generation failed');
     return result;
   },
 };
 
-// Project Generator API
 export interface ProjectGeneratorRequest {
   job_role: string;
   job_description: string;
@@ -510,23 +476,17 @@ export interface ProjectGeneratorResponse {
 
 export const projectGeneratorApi = {
   generate: async (data: ProjectGeneratorRequest): Promise<ProjectGeneratorResponse> => {
-    const response = await fetch(`${ANALYZER_BASE_URL}/project-gen`, {
+    const res = await authFetch(`${ANALYZER_BASE_URL}/project-gen`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
-    const result = await response.json();
-    
-    if (!response.ok || result.status !== 'success') {
-      throw new Error(result.message || 'Project generation failed');
-    }
-    
+    const result = await res.json();
+    if (!res.ok || result.status !== 'success') throw new Error(result.message || 'Project generation failed');
     return result;
   },
 };
 
-// Skills Generator API
 export interface SkillsGeneratorRequest {
   job_role: string;
   job_description: string;
@@ -549,19 +509,13 @@ export interface SkillsGeneratorResponse {
 
 export const skillsGeneratorApi = {
   generate: async (data: SkillsGeneratorRequest): Promise<SkillsGeneratorResponse> => {
-    const response = await fetch(`${ANALYZER_BASE_URL}/skill-gen`, {
+    const res = await authFetch(`${ANALYZER_BASE_URL}/skill-gen`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
-    const result = await response.json();
-    
-    if (!response.ok || result.status !== 'success') {
-      throw new Error(result.message || 'Skills generation failed');
-    }
-    
+    const result = await res.json();
+    if (!res.ok || result.status !== 'success') throw new Error(result.message || 'Skills generation failed');
     return result;
   },
 };
-

@@ -1,0 +1,30 @@
+# ============================================================
+# Resume Analyzer — Frontend Docker Compose
+# Service: React SPA served via Nginx
+#
+# Usage:
+#   VITE_API_BASE_URL=http://your-backend:8000 docker compose up --build
+#
+# The frontend is available at http://localhost (port 80).
+# Set FRONTEND_PORT to override (e.g. FRONTEND_PORT=3000).
+#
+# VITE_API_BASE_URL is compiled into the JS bundle at build time.
+# It must point to the publicly reachable URL of the backend API.
+# ============================================================
+
+services:
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
+    container_name: resumeanalyzer_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+
+networks:
+  default:
+    name: resumeanalyzer_frontend_network

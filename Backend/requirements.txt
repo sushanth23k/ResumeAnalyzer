@@ -1,11 +1,22 @@
-# Django Resume Analyzer Requirements
-Django==4.2.7
+# Django Core — minimum 4.2.16 required for django-allauth 65.x compatibility
+Django>=4.2.16,<5.0
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
 
-# External Libraries
-pandas==2.3.3
+# Database
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0
+
+# Authentication
+django-allauth>=65.14.3
+djangorestframework-simplejwt>=5.3.0
+
+# Utilities
 python-dotenv
+PyJWT>=2.8.0
+
+# External Libraries
+pandas>=2.0.0
 
 # AI Libraries
 groq>=0.35.0
