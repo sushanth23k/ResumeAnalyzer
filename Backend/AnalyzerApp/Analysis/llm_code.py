@@ -57,10 +57,10 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
     prompt = prompt + work_experience_str + additional_instruction_text + """
     Requirements for the bullet points:
     1. Use the structure: What + How + Why/Impact (except the first bullet, which is a simple, high-level summary).
-    2. The first bullet for each experience should be a clear summary written so simply that a toddler could understand the core value.
+    2. The first bullet for each experience should be a clear summary of the experience should be presented as a resume work experience bullet point.
     3. Aggressively incorporate relevant keywords and skills from the job description to maximize ATS scoring, but only where they make sense.
     4. Do not repeat any single skill more than 4 times across all experiences.
-    5. Each bullet point must contain at least 15-20 words.
+    5. Each bullet point must contain at least 25-30 words.
     6. Include clear, quantifiable outcomes or improvements (numbers, percentages, time saved, revenue impact, scale, reliability, etc.).
     7. Explicitly optimize content for ATS keyword filtering and recruiter readability (concise, impact-focused, no fluff).
     8. Add missing but relevant skills/tools from the job description by credibly mapping them onto the candidate's existing responsibilities and projects.
