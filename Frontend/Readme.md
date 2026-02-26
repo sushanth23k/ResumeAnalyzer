@@ -1,4 +1,4 @@
-# Resume Analyzer — Frontend
+# Job Matrix — Frontend
 
 React TypeScript SPA for managing job applications, user profiles, and generating AI-powered resume content.
 

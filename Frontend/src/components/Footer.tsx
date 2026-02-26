@@ -13,7 +13,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ 
   className, 
-  copyrightText = '© 2025 Resume Analyzer. All rights reserved.' 
+  copyrightText = '© 2025 Job Matrix. All rights reserved.' 
 }) => {
   const footerLinks: FooterLink[] = [
     { url: '/privacy', label: 'Privacy Policy' },
@@ -25,17 +25,15 @@ const Footer: React.FC<FooterProps> = ({
     <footer className={`${styles.footer} ${className || ''}`}>
       <div className={styles.container}>
         <div className={styles.content}>
-          <p className={styles.copyright}>{copyrightText}</p>
+          <div className={styles.brand}>
+            <span className={styles.brandName}>Job Matrix</span>
+            <p className={styles.copyright}>{copyrightText}</p>
+          </div>
           <div className={styles.links}>
-            {footerLinks.map((link, index) => (
-              <React.Fragment key={link.url}>
-                <a href={link.url} className={styles.link}>
-                  {link.label}
-                </a>
-                {index < footerLinks.length - 1 && (
-                  <span className={styles.separator}>|</span>
-                )}
-              </React.Fragment>
+            {footerLinks.map((link) => (
+              <a key={link.url} href={link.url} className={styles.link}>
+                {link.label}
+              </a>
             ))}
           </div>
         </div>

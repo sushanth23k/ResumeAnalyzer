@@ -1,169 +1,253 @@
+/* ══════════════════════════════════════════════════════════
+   HEADER — Glassmorphism Sticky Navigation
+══════════════════════════════════════════════════════════ */
+
 .header {
-  background-color: #1a1a1a;
-  border-bottom: 1px solid #333;
-  padding: 0.75rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-base), border-color var(--transition-base);
+  height: var(--header-height);
   display: flex;
   align-items: center;
-  gap: 1.5rem;
 }
 
+/* ── Container ─────────────────────────────────────────── */
+.container {
+  max-width: var(--container-2xl);
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+/* ── Logo ──────────────────────────────────────────────── */
 .logo {
   flex-shrink: 0;
 }
 
 .logo a {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #646cff;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.2s;
+  transition: opacity var(--transition-fast);
 }
 
-.logo a:hover {
-  color: #535bf2;
+.logoMark {
+  display: block;
+  width: 100px;
+  height: 120px;
+  border-radius: 0%;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
-.nav {
-  flex: 1;
+.logo a:hover .logoMark {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
+
+/* ── Nav ───────────────────────────────────────────────── */
+.nav { flex: 1; }
 
 .navList {
   display: flex;
   list-style: none;
-  gap: 0.25rem;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
 }
 
-.navItem {
-  margin: 0;
-}
+.navItem { margin: 0; }
 
 .navLink {
   display: block;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.4rem 0.85rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: background-color 0.2s, color 0.2s;
+  padding: 0.45rem 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: all var(--transition-fast);
   white-space: nowrap;
+  position: relative;
+  letter-spacing: var(--tracking-normal);
 }
 
 .navLink:hover {
-  background-color: rgba(100, 108, 255, 0.1);
-  color: #646cff;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .navLink.active {
-  background-color: #646cff;
-  color: white;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  font-weight: 700;
 }
 
-/* ─── User area (email + logout) ────────────────────────────────────────── */
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+}
 
-.userArea {
+/* ── Controls (theme toggle + user + logout) ───────────── */
+.controls {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   flex-shrink: 0;
   margin-left: auto;
 }
 
+/* ── Theme Toggle ──────────────────────────────────────── */
+.themeToggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.themeTrack {
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--border-default);
+  padding: 3px;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.themeToggle:hover .themeTrack {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.themeThumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 11px;
+  transition: transform var(--transition-spring);
+  position: absolute;
+  left: 3px;
+}
+
+/* Dark mode: thumb slides to right */
+:global([data-theme="dark"]) .themeThumb {
+  transform: translateX(23px);
+}
+
+/* ── User Avatar ───────────────────────────────────────── */
+.userAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-vivid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-pink);
+}
+
 .userEmail {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 180px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
 
+/* ── Logout Button ─────────────────────────────────────── */
 .logoutBtn {
-  padding: 0.35rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 500;
+  padding: 0.4rem 0.875rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
   background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  border: 1px solid #444;
-  border-radius: 6px;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+  transition: all var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .logoutBtn:hover:not(:disabled) {
-  border-color: #ff6b6b;
-  color: #ff9090;
-  background-color: rgba(255, 107, 107, 0.08);
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: var(--color-error-light);
 }
 
 .logoutBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* ─── Light mode ─────────────────────────────────────────────────────────── */
-
-@media (prefers-color-scheme: light) {
-  .header {
-    background-color: #ffffff;
-    border-bottom-color: #e0e0e0;
-  }
-
-  .navLink {
-    color: #444;
-  }
-
-  .navLink:hover {
-    color: #646cff;
-  }
-
-  .userEmail {
-    color: #888;
-  }
-
-  .logoutBtn {
-    color: #555;
-    border-color: #ccc;
-  }
-
-  .logoutBtn:hover:not(:disabled) {
-    color: #cc3333;
-    border-color: #cc3333;
-    background-color: rgba(204, 51, 51, 0.05);
-  }
-}
-
-/* ─── Mobile ─────────────────────────────────────────────────────────────── */
-
-@media (max-width: 768px) {
+/* ── Mobile ────────────────────────────────────────────── */
+@media (max-width: 900px) {
   .container {
+    padding: 0 var(--space-4);
     flex-wrap: wrap;
-    gap: 0.75rem;
+    height: auto;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
   }
+
+  .header { height: auto; }
 
   .nav {
     order: 3;
     width: 100%;
+    border-top: 1px solid var(--border-light);
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-1);
   }
 
-  .navList {
-    flex-wrap: wrap;
-    gap: 0.25rem;
+  .navList { flex-wrap: wrap; gap: var(--space-1); }
+
+  .navLink.active::after { display: none; }
+
+  .controls { margin-left: 0; }
+
+  .userEmail { display: none; }
+}
+
+@media (max-width: 480px) {
+  .navLink {
+    font-size: var(--text-xs);
+    padding: 0.3rem 0.6rem;
   }
 
-  .userArea {
-    margin-left: 0;
-  }
 }

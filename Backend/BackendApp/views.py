@@ -373,16 +373,65 @@ def skills(request):
     # POST
     try:
         body = request.data
-        skill = Skills(skill_name=body.get('skillName'), category=body.get('category'))
-        skill.full_clean()
-        skill.save()
-        return ok(serialize_skill(skill), "Skill created successfully")
+        action = body.get('action', 'create')
+
+        if action == 'create':
+            skill = Skills(skill_name=body.get('skillName'), category=body.get('category'))
+            skill.full_clean()
+            skill.save()
+            return ok(serialize_skill(skill), "Skill created successfully")
+
+        elif action == 'update':
+            skill_id = body.get('id')
+            if not skill_id:
+                return err("VALIDATION_ERROR", "Skill ID is required for update")
+            try:
+                skill = Skills.objects.get(id=skill_id)
+            except Skills.DoesNotExist:
+                return err("NOT_FOUND", "Skill not found", status=404)
+            if 'skillName' in body:
+                skill.skill_name = body['skillName']
+            if 'category' in body:
+                skill.category = body['category']
+            skill.full_clean()
+            skill.save()
+            return ok(serialize_skill(skill), "Skill updated successfully")
+
+        elif action == 'delete':
+            skill_id = body.get('id')
+            if not skill_id:
+                return err("VALIDATION_ERROR", "Skill ID is required for delete")
+            try:
+                skill = Skills.objects.get(id=skill_id)
+                skill.delete()
+                return ok(None, "Skill deleted successfully")
+            except Skills.DoesNotExist:
+                return err("NOT_FOUND", "Skill not found", status=404)
+
+        elif action == 'rename_category':
+            old_category = body.get('oldCategory')
+            new_category = body.get('newCategory')
+            if not old_category or not new_category:
+                return err("VALIDATION_ERROR", "oldCategory and newCategory are required")
+            updated = Skills.objects.filter(category=old_category).update(category=new_category)
+            return ok({"updated": updated}, f"Category renamed from '{old_category}' to '{new_category}'")
+
+        elif action == 'delete_category':
+            category = body.get('category')
+            if not category:
+                return err("VALIDATION_ERROR", "category is required")
+            deleted_count, _ = Skills.objects.filter(category=category).delete()
+            return ok({"deleted": deleted_count}, f"Category '{category}' and {deleted_count} skill(s) deleted")
+
+        else:
+            return err("VALIDATION_ERROR", f"Invalid action: {action}. Use create, update, delete, rename_category, or delete_category")
+
     except ValidationError as e:
         return validation_err(e)
     except IntegrityError:
         return err("DUPLICATE_ENTRY", "Skill name already exists", status=400)
     except Exception as e:
-        return err("DATABASE_ERROR", "Failed to create skill", str(e), 500)
+        return err("DATABASE_ERROR", "Failed to process skill request", str(e), 500)
 
 
 # ─── 5. User Skills ───────────────────────────────────────────────────────────

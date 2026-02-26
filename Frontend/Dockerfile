@@ -1,5 +1,5 @@
 # ============================================================
-# Resume Analyzer Frontend — Dockerfile
+# Job Matrix Frontend — Dockerfile
 # Multi-stage build: Node.js (build) → Nginx (serve)
 # ============================================================
 

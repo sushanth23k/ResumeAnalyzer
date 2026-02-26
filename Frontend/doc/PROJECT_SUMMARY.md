@@ -1,4 +1,4 @@
-# Resume Analyzer - Project Summary
+# Job Matrix - Project Summary
 
 ## 🎯 Overview
 A complete React TypeScript application for managing job applications and generating tailored resume content. Built with modern UI/UX principles, featuring responsive design and dark mode support.

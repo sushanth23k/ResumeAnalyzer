@@ -172,19 +172,9 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
   if (loading) {
     return (
       <div className={styles.generator}>
-        <div className={styles.loading}>Loading projects...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.generator}>
-        <div className={styles.error}>
-          <p>⚠️ {error}</p>
-          <button onClick={loadProjects} className={styles.retryButton}>
-            Retry
-          </button>
+        <div className={styles.loadingState}>
+          <span className={styles.loadSpinner} />
+          Loading your projects…
         </div>
       </div>
     );
@@ -192,9 +182,18 @@ const ProjectGenerator: React.FC<ProjectGeneratorProps> = ({ onComplete, sharedD
 
   return (
     <div className={styles.generator}>
+      {/* ── Dismissible Error Banner ── */}
+      {error && (
+        <div className={styles.errorBanner}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.errorDismiss} aria-label="Dismiss">✕</button>
+        </div>
+      )}
+
       <div className={styles.header}>
+        <p className={styles.stepEyebrow}>Step 2 of 4</p>
         <h2>💼 Project Generator</h2>
-        <p>Generate or skip to continue</p>
+        <p>AI will craft compelling project descriptions optimised for the target role. You can also skip this step.</p>
       </div>
 
       <div className={styles.section}>

@@ -37,7 +37,7 @@ const Home: React.FC<HomeProps> = ({ className }) => {
   return (
     <div className={`${styles.home} ${className || ''}`}>
       <section className={styles.hero}>
-        <h1 className={styles.title}>Welcome to Resume Analyzer</h1>
+        <h1 className={styles.title}>Welcome to Job Matrix</h1>
         <p className={styles.subtitle}>
           Transform your resume with AI-powered insights and land your dream job
         </p>

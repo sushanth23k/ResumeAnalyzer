@@ -163,19 +163,9 @@ const SkillsGenerator: React.FC<SkillsGeneratorProps> = ({ onComplete, sharedDat
   if (loading) {
     return (
       <div className={styles.generator}>
-        <div className={styles.loading}>Loading skills...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.generator}>
-        <div className={styles.error}>
-          <p>⚠️ {error}</p>
-          <button onClick={loadSkills} className={styles.retryButton}>
-            Retry
-          </button>
+        <div className={styles.loadingState}>
+          <span className={styles.loadSpinner} />
+          Loading your skills…
         </div>
       </div>
     );
@@ -183,9 +173,18 @@ const SkillsGenerator: React.FC<SkillsGeneratorProps> = ({ onComplete, sharedDat
 
   return (
     <div className={styles.generator}>
+      {/* ── Dismissible Error Banner ── */}
+      {error && (
+        <div className={styles.errorBanner}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.errorDismiss} aria-label="Dismiss">✕</button>
+        </div>
+      )}
+
       <div className={styles.header}>
+        <p className={styles.stepEyebrow}>Step 3 of 4</p>
         <h2>⚡ Skills Generator</h2>
-        <p>Generate or skip to continue</p>
+        <p>AI will select and reorder the most relevant skills from your profile for the target role. You can also skip.</p>
       </div>
 
       <div className={styles.section}>

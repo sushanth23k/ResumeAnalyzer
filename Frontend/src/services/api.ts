@@ -1,4 +1,4 @@
-// API Service for Resume Analyzer Backend
+// API Service for Job Matrix Backend
 import { authFetch } from '../utils/apiClient';
 
 export const BackendURL = 'http://127.0.0.1:8000/';
@@ -149,9 +149,45 @@ export const skillsApi = {
     const res = await authFetch(`${API_BASE_URL}/skills`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skillName, category }),
+      body: JSON.stringify({ action: 'create', skillName, category }),
     });
     return handleResponse<SkillData>(res);
+  },
+
+  update: async (id: string, skillName: string, category: string): Promise<SkillData> => {
+    const res = await authFetch(`${API_BASE_URL}/skills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', id, skillName, category }),
+    });
+    return handleResponse<SkillData>(res);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const res = await authFetch(`${API_BASE_URL}/skills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id }),
+    });
+    await handleResponse<void>(res);
+  },
+
+  renameCategory: async (oldCategory: string, newCategory: string): Promise<void> => {
+    const res = await authFetch(`${API_BASE_URL}/skills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'rename_category', oldCategory, newCategory }),
+    });
+    await handleResponse<void>(res);
+  },
+
+  deleteCategory: async (category: string): Promise<void> => {
+    const res = await authFetch(`${API_BASE_URL}/skills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete_category', category }),
+    });
+    await handleResponse<void>(res);
   },
 
   getUserSkills: async (): Promise<SkillData[]> => {

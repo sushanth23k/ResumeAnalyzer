@@ -37,7 +37,7 @@ const About: React.FC<AboutProps> = ({ className }) => {
   return (
     <div className={`${styles.about} ${className || ''}`}>
       <section className={styles.intro}>
-        <h1 className={styles.title}>About Resume Analyzer</h1>
+        <h1 className={styles.title}>About Job Matrix</h1>
         <p className={styles.description}>
           We are a team of passionate professionals dedicated to helping job seekers 
           create outstanding resumes that get noticed. Our AI-powered platform analyzes 

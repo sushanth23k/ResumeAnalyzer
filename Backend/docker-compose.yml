@@ -1,37 +1,18 @@
 # ============================================================
 # Resume Analyzer — Backend Docker Compose
-# Services: PostgreSQL (general / resumeanalyzer schema) + Django/Gunicorn
+# Services: Django/Gunicorn only
+#
+# Database connection is configured via environment variables in Django settings.
+# Set DB_URL or DB_POOL_URL in your .env file to point to your external database.
 #
 # Usage:
-#   cp .env.example .env        # fill in secrets
+#   cp .env.example .env        # fill in secrets and DB_URL
 #   docker compose up --build
 #
 # The backend API is available at http://localhost:8000
 # ============================================================
 
 services:
-
-  # ── PostgreSQL ────────────────────────────────────────────────────────────
-  db:
-    image: postgres:15-alpine
-    container_name: resumeanalyzer_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: general
-      POSTGRES_USER: resumeanalyzer
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme_in_production}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
-    ports:
-      - "5432:5432"
-    networks:
-      - backend_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U resumeanalyzer -d general"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # ── Django + Gunicorn ─────────────────────────────────────────────────────
   backend:
@@ -42,9 +23,6 @@ services:
     restart: unless-stopped
     command: >
       sh -c "
-        echo 'Waiting for database...' &&
-        while ! nc -z db 5432; do sleep 1; done &&
-        echo 'Database is ready!' &&
         python manage.py migrate --noinput &&
         python manage.py collectstatic --noinput &&
         gunicorn --config gunicorn.conf.py ResumeAnalyzer.wsgi:application
@@ -55,17 +33,15 @@ services:
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
-      - DB_URL=postgresql://resumeanalyzer:${DB_PASSWORD:-changeme_in_production}@db:5432/general
-      - DB_SSL_REQUIRE=False
+      - DB_URL=${DB_URL}
+      - DB_POOL_URL=${DB_POOL_URL:-}
+      - DB_SSL_REQUIRE=${DB_SSL_REQUIRE:-True}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
       - GROQ_API_KEY=${GROQ_API_KEY}
       - MODEL_NAME=${MODEL_NAME:-llama3-8b-8192}
       - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
       - REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:-False}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
-    depends_on:
-      db:
-        condition: service_healthy
     ports:
       - "8000:8000"
     networks:
@@ -77,8 +53,6 @@ networks:
     name: resumeanalyzer_backend_network
 
 volumes:
-  postgres_data:
-    name: resumeanalyzer_postgres_data
   media_volume:
     name: resumeanalyzer_media
   static_volume:

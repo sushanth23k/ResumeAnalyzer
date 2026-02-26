@@ -2,60 +2,149 @@ import React, { useState, useEffect } from 'react';
 import { projectsApi, skillsApi, ProjectData, SkillData } from '../../services/api';
 import styles from './ProjectsAndSkills.module.css';
 
-const ProjectsAndSkills: React.FC = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Projects state
-  const [projects, setProjects] = useState<ProjectData[]>([]);
-  
-  // Skills state
-  const [userSkills, setUserSkills] = useState<SkillData[]>([]);
-  const [allSkills, setAllSkills] = useState<SkillData[]>([]);
-  const [newSkillName, setNewSkillName] = useState('');
-  const [newSkillCategory, setNewSkillCategory] = useState('');
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+interface ConfirmDeleteCategory {
+  name: string;
+  count: number;
+}
 
-  // Load data on mount
+const ProjectsAndSkills: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [opLoading, setOpLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Projects
+  const [isEditingProjects, setIsEditingProjects] = useState(false);
+  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [allSkills, setAllSkills] = useState<SkillData[]>([]); // for project skill picker
+
+  // User skills (grouped by category)
+  const [userSkills, setUserSkills] = useState<SkillData[]>([]);
+
+  // Adding a skill inline inside a category card
+  const [addingSkillToCategory, setAddingSkillToCategory] = useState<string | null>(null);
+  const [newSkillInput, setNewSkillInput] = useState('');
+
+  // Adding a new category
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryInput, setNewCategoryInput] = useState('');
+  // Categories that have been named but have no skills yet
+  const [pendingCategories, setPendingCategories] = useState<string[]>([]);
+
+  // Confirm-delete modal for a whole category
+  const [confirmDeleteCategory, setConfirmDeleteCategory] = useState<ConfirmDeleteCategory | null>(null);
+
   useEffect(() => {
-    loadAllData();
+    loadAll();
   }, []);
 
-  const loadAllData = async () => {
+  // ─── Data loading ────────────────────────────────────────────────────────────
+
+  const loadAll = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Load projects
-      const projectsData = await projectsApi.getAll();
-      setProjects(projectsData);
-      
-      // Load user skills
-      const userSkillsData = await skillsApi.getUserSkills();
-      setUserSkills(userSkillsData);
-      
-      // Load all available skills
-      const allSkillsData = await skillsApi.getAll();
-      setAllSkills(allSkillsData);
-      
-      // Extract unique categories from all skills
-      const categories = [...new Set(allSkillsData.map(s => s.category))].sort();
-      setAvailableCategories(categories);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
-      console.error('Error loading data:', err);
+      const [proj, us, all] = await Promise.all([
+        projectsApi.getAll(),
+        skillsApi.getUserSkills(),
+        skillsApi.getAll(),
+      ]);
+      setProjects(proj);
+      setUserSkills(us);
+      setAllSkills(all);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load data');
     } finally {
       setLoading(false);
     }
   };
+
+  const reloadSkills = async () => {
+    const [us, all] = await Promise.all([
+      skillsApi.getUserSkills(),
+      skillsApi.getAll(),
+    ]);
+    setUserSkills(us);
+    setAllSkills(all);
+  };
+
+  // ─── Skill handlers ───────────────────────────────────────────────────────────
+
+  const handleAddSkill = async (category: string) => {
+    const name = newSkillInput.trim();
+    if (!name) return;
+    setOpLoading(true);
+    setError(null);
+    try {
+      const created = await skillsApi.create(name, category);
+      await skillsApi.addUserSkills([created.id]);
+      setPendingCategories(prev => prev.filter(c => c !== category));
+      setAddingSkillToCategory(null);
+      setNewSkillInput('');
+      await reloadSkills();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to add skill');
+    } finally {
+      setOpLoading(false);
+    }
+  };
+
+  const handleDeleteSkill = async (skillId: string) => {
+    setOpLoading(true);
+    setError(null);
+    try {
+      await skillsApi.delete(skillId);
+      await reloadSkills();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete skill');
+    } finally {
+      setOpLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!confirmDeleteCategory) return;
+    setOpLoading(true);
+    setError(null);
+    try {
+      if (confirmDeleteCategory.count > 0) {
+        await skillsApi.deleteCategory(confirmDeleteCategory.name);
+      }
+      setPendingCategories(prev => prev.filter(c => c !== confirmDeleteCategory.name));
+      setConfirmDeleteCategory(null);
+      await reloadSkills();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete category');
+      setConfirmDeleteCategory(null);
+    } finally {
+      setOpLoading(false);
+    }
+  };
+
+  const handleStartAddCategory = () => {
+    setAddingCategory(true);
+    setNewCategoryInput('');
+  };
+
+  const handleConfirmNewCategory = () => {
+    const name = newCategoryInput.trim();
+    if (!name) return;
+    if (!groupedSkills[name] && !pendingCategories.includes(name)) {
+      setPendingCategories(prev => [...prev, name]);
+    }
+    setAddingCategory(false);
+    setNewCategoryInput('');
+    // Immediately open the "add skill" input for the new category
+    setAddingSkillToCategory(name);
+    setNewSkillInput('');
+  };
+
+  // ─── Project handlers ─────────────────────────────────────────────────────────
 
   const handleProjectChange = (index: number, field: 'projectName' | 'projectInfo', value: string) => {
     const updated = [...projects];
     updated[index] = { ...updated[index], [field]: value };
     setProjects(updated);
   };
-
 
   const addProjectSkill = (projectIndex: number, skillId: string) => {
     const skill = allSkills.find(s => s.id === skillId);
@@ -75,13 +164,7 @@ const ProjectsAndSkills: React.FC = () => {
   const addProject = () => {
     setProjects(prev => [
       ...prev,
-      {
-        id: '',
-        projectName: '',
-        projectInfo: '',
-        skills: [],
-        displayOrder: prev.length,
-      },
+      { id: '', projectName: '', projectInfo: '', skills: [], displayOrder: prev.length },
     ]);
   };
 
@@ -89,67 +172,19 @@ const ProjectsAndSkills: React.FC = () => {
     setProjects(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddUserSkill = async (skillId: string) => {
+  const handleSaveProjects = async () => {
+    setOpLoading(true);
+    setError(null);
     try {
-      setError(null);
-      await skillsApi.addUserSkills([skillId]);
-      await loadAllData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add skill');
-      console.error('Error adding skill:', err);
-    }
-  };
-
-  const handleRemoveUserSkill = async (skillId: string) => {
-    try {
-      setError(null);
-      await skillsApi.removeUserSkills([skillId]);
-      await loadAllData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove skill');
-      console.error('Error removing skill:', err);
-    }
-  };
-
-  const handleCreateNewSkill = async () => {
-    if (!newSkillName.trim() || !newSkillCategory.trim()) {
-      setError('Skill name and category are required');
-      return;
-    }
-    
-    try {
-      setError(null);
-      const created = await skillsApi.create(newSkillName.trim(), newSkillCategory.trim());
-      await skillsApi.addUserSkills([created.id]);
-      await loadAllData();
-      setNewSkillName('');
-      setNewSkillCategory('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create skill');
-      console.error('Error creating skill:', err);
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      setError(null);
-      setLoading(true);
-      
-      // Save projects - delete removed ones, update existing, create new
-      const existingProjectIds = projects.filter(p => p.id).map(p => p.id);
-      
-      // Delete projects that were removed
-      const originalProjects = await projectsApi.getAll();
-      for (const original of originalProjects) {
-        if (original.id && !existingProjectIds.includes(original.id)) {
-          await projectsApi.delete(original.id);
+      const existingIds = projects.filter(p => p.id).map(p => p.id);
+      const originals = await projectsApi.getAll();
+      for (const orig of originals) {
+        if (orig.id && !existingIds.includes(orig.id)) {
+          await projectsApi.delete(orig.id);
         }
       }
-      
-      // Create or update projects
       for (const project of projects) {
         const skillIds = project.skills.map(s => s.id);
-        
         if (project.id) {
           await projectsApi.update(project.id, {
             projectName: project.projectName,
@@ -166,271 +201,419 @@ const ProjectsAndSkills: React.FC = () => {
           project.id = created.id;
         }
       }
-      
-      // Reload data to ensure consistency
-      await loadAllData();
-      setIsEditing(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save data');
-      console.error('Error saving data:', err);
+      await loadAll();
+      setIsEditingProjects(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to save projects');
     } finally {
-      setLoading(false);
+      setOpLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    loadAllData();
-    setIsEditing(false);
+  const handleCancelProjects = () => {
+    loadAll();
+    setIsEditingProjects(false);
   };
 
-  if (loading && !isEditing) {
+  // ─── Derived state ─────────────────────────────────────────────────────────────
+
+  const groupedSkills = userSkills.reduce<Record<string, SkillData[]>>((acc, skill) => {
+    const cat = skill.category || 'Uncategorized';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(skill);
+    return acc;
+  }, {});
+
+  const allCategories = [
+    ...Object.keys(groupedSkills),
+    ...pendingCategories.filter(c => !groupedSkills[c]),
+  ];
+
+  const totalSkills = userSkills.length;
+  const totalCategories = Object.keys(groupedSkills).length + pendingCategories.filter(c => !groupedSkills[c]).length;
+
+  if (loading) {
     return (
-      <div className={styles.projectsAndSkills}>
-        <div className={styles.loading}>Loading...</div>
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
+          <span>Loading...</span>
+        </div>
       </div>
     );
   }
 
-  // Get available skills that are not in user's skill list
-  const availableSkills = allSkills.filter(
-    skill => !userSkills.some(us => us.id === skill.id)
-  );
-
   return (
-    <div className={styles.projectsAndSkills}>
+    <div className={styles.container}>
+      {/* ── Error banner ── */}
       {error && (
-        <div className={styles.error}>
-          <p>⚠️ {error}</p>
-          <button onClick={loadAllData} className={styles.retryButton}>
-            Retry
-          </button>
+        <div className={styles.errorBanner}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.errorDismiss}>✕</button>
         </div>
       )}
-      
-      <div className={styles.header}>
-        <h2>Projects and Skills</h2>
-        {!isEditing ? (
-          <button onClick={() => setIsEditing(true)} className={styles.editButton}>
-            ✏️ Edit
-          </button>
-        ) : (
-          <div className={styles.actions}>
-            <button onClick={handleSave} className={styles.saveButton} disabled={loading}>
-              💾 {loading ? 'Saving...' : 'Save'}
-            </button>
-            <button onClick={handleCancel} className={styles.cancelButton} disabled={loading}>
-              ❌ Cancel
-            </button>
+
+      {/* ── Page Header ── */}
+      <div className={styles.pageHeader}>
+        <div>
+          <p className={styles.eyebrow}>Applicant Profile</p>
+          <h2 className={styles.pageTitle}>Projects & Skills</h2>
+          <p className={styles.pageSubtitle}>Portfolio projects and skill categories used in resume generation</p>
+        </div>
+      </div>
+
+      {/* ── Stats Strip ── */}
+      <div className={styles.statsStrip}>
+        <div className={`${styles.statCard} ${styles.statPrimary}`}>
+          <span className={styles.statIcon}>💼</span>
+          <span className={styles.statValue}>{projects.length}</span>
+          <span className={styles.statLabel}>Projects</span>
+        </div>
+        <div className={`${styles.statCard} ${styles.statSecondary}`}>
+          <span className={styles.statIcon}>⚡</span>
+          <span className={styles.statValue}>{totalSkills}</span>
+          <span className={styles.statLabel}>Skills</span>
+        </div>
+        <div className={`${styles.statCard} ${styles.statAccent}`}>
+          <span className={styles.statIcon}>🏷️</span>
+          <span className={styles.statValue}>{totalCategories}</span>
+          <span className={styles.statLabel}>Categories</span>
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════════
+          PROJECTS SECTION
+      ════════════════════════════════════════════ */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.sectionEyebrow}>Section 1 of 2</p>
+            <h2 className={styles.sectionTitle}>Projects</h2>
           </div>
-        )}
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h3>Projects</h3>
-          {isEditing && (
-            <button onClick={addProject} className={styles.addButton}>
-              + Add Project
+          {!isEditingProjects ? (
+            <button onClick={() => setIsEditingProjects(true)} className={styles.editButton}>
+              ✏️ Edit
             </button>
-          )}
-        </div>
-
-        {projects.length === 0 ? (
-          <p className={styles.empty}>No projects added yet</p>
-        ) : (
-          projects.map((project, index) => (
-            <div key={project.id || index} className={styles.projectCard}>
-              <div className={styles.field}>
-                <label>Project Name *</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={project.projectName}
-                    onChange={e => handleProjectChange(index, 'projectName', e.target.value)}
-                    required
-                  />
-                ) : (
-                  <h4>{project.projectName}</h4>
-                )}
-              </div>
-
-              <div className={styles.field}>
-                <label>Skills</label>
-                {isEditing ? (
-                  <div>
-                    <select
-                      onChange={e => {
-                        if (e.target.value) {
-                          addProjectSkill(index, e.target.value);
-                          e.target.value = '';
-                        }
-                      }}
-                      className={styles.select}
-                    >
-                      <option value="">Select a skill to add...</option>
-                      {allSkills
-                        .filter(skill => !project.skills.some(s => s.id === skill.id))
-                        .map(skill => (
-                          <option key={skill.id} value={skill.id}>
-                            {skill.skillName} ({skill.category})
-                          </option>
-                        ))}
-                    </select>
-                    <div className={styles.tags}>
-                      {project.skills.map(skill => (
-                        <span key={skill.id} className={styles.tag}>
-                          {skill.skillName}
-                          <button
-                            onClick={() => removeProjectSkill(index, skill.id)}
-                            className={styles.tagRemove}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className={styles.tags}>
-                    {project.skills.length === 0 ? (
-                      <span className={styles.empty}>No skills added</span>
-                    ) : (
-                      project.skills.map(skill => (
-                        <span key={skill.id} className={styles.tag}>
-                          {skill.skillName}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className={styles.field}>
-                <label>Project Info *</label>
-                {isEditing ? (
-                  <textarea
-                    value={project.projectInfo}
-                    onChange={e => handleProjectChange(index, 'projectInfo', e.target.value)}
-                    rows={8}
-                    required
-                  />
-                ) : (
-                  <p>{project.projectInfo || '-'}</p>
-                )}
-              </div>
-
-              {isEditing && (
-                <button onClick={() => removeProject(index)} className={styles.removeButton}>
-                  Remove Project
-                </button>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h3>Your Skills</h3>
-          {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className={styles.editButton}>
-              ✏️ Manage Skills
-            </button>
-          )}
-        </div>
-
-        {isEditing && (
-          <div className={styles.skillsManagement}>
-            <div className={styles.skillSelection}>
-              <select
-                onChange={e => {
-                  if (e.target.value) {
-                    handleAddUserSkill(e.target.value);
-                  }
-                }}
-                className={styles.select}
-              >
-                <option value="">Add existing skill...</option>
-                {availableSkills.map(skill => (
-                  <option key={skill.id} value={skill.id}>
-                    {skill.skillName} ({skill.category})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.newSkillForm}>
-              <input
-                type="text"
-                placeholder="Skill name"
-                value={newSkillName}
-                onChange={e => setNewSkillName(e.target.value)}
-                className={styles.input}
-              />
-              <select
-                value={newSkillCategory}
-                onChange={e => setNewSkillCategory(e.target.value)}
-                className={styles.select}
-              >
-                <option value="">Select or type new category...</option>
-                {availableCategories.map(category => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Or type new category"
-                value={newSkillCategory && !availableCategories.includes(newSkillCategory) ? newSkillCategory : ''}
-                onChange={e => setNewSkillCategory(e.target.value)}
-                className={styles.input}
-              />
-              <button onClick={handleCreateNewSkill} className={styles.saveButton}>
-                + Add Skill
+          ) : (
+            <div className={styles.headerActions}>
+              <button onClick={handleSaveProjects} className={styles.saveButton} disabled={opLoading}>
+                {opLoading ? 'Saving…' : '💾 Save'}
+              </button>
+              <button onClick={handleCancelProjects} className={styles.cancelButton} disabled={opLoading}>
+                ✕ Cancel
               </button>
             </div>
-          </div>
+          )}
+        </div>
+
+        {isEditingProjects && (
+          <button onClick={addProject} className={styles.addProjectButton}>
+            + Add Project
+          </button>
         )}
 
-        {userSkills.length === 0 ? (
-          <p className={styles.empty}>No skills added yet</p>
-        ) : (
-          <div className={styles.skillsGrid}>
-            {Object.entries(
-              userSkills.reduce((acc, skill) => {
-                if (!acc[skill.category]) {
-                  acc[skill.category] = [];
-                }
-                acc[skill.category].push(skill);
-                return acc;
-              }, {} as Record<string, typeof userSkills>)
-            ).map(([category, categorySkills]) => (
-              <div key={category} className={styles.skillsGridRow}>
-                <div className={styles.skillsGridCategory}>
-                  <h4>{category}</h4>
-                </div>
-                <div className={styles.skillsGridSkills}>
-                  <div className={styles.tags}>
-                    {categorySkills.map(skill => (
-                      <span key={skill.id} className={styles.tag}>
+        {projects.length === 0 && !isEditingProjects && (
+          <div className={styles.emptyState}>No projects added yet.</div>
+        )}
+
+        {projects.map((project, index) => (
+          <div key={project.id || index} className={styles.projectCard}>
+            {isEditingProjects && (
+              <button
+                onClick={() => removeProject(index)}
+                className={styles.projectDeleteBtn}
+                title="Remove project"
+              >
+                🗑
+              </button>
+            )}
+
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Project Name</label>
+              {isEditingProjects ? (
+                <input
+                  type="text"
+                  value={project.projectName}
+                  onChange={e => handleProjectChange(index, 'projectName', e.target.value)}
+                  className={styles.fieldInput}
+                  placeholder="Project name"
+                />
+              ) : (
+                <h4 className={styles.projectName}>{project.projectName}</h4>
+              )}
+            </div>
+
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Skills Used</label>
+              {isEditingProjects ? (
+                <>
+                  <select
+                    onChange={e => {
+                      if (e.target.value) {
+                        addProjectSkill(index, e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    className={styles.fieldSelect}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select a skill…</option>
+                    {allSkills
+                      .filter(s => !project.skills.some(ps => ps.id === s.id))
+                      .map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.skillName} ({s.category})
+                        </option>
+                      ))}
+                  </select>
+                  <div className={styles.skillTags}>
+                    {project.skills.map(skill => (
+                      <span key={skill.id} className={styles.skillTag}>
                         {skill.skillName}
-                        {isEditing && (
-                          <button
-                            onClick={() => handleRemoveUserSkill(skill.id)}
-                            className={styles.tagRemove}
-                          >
-                            ×
-                          </button>
-                        )}
+                        <button
+                          onClick={() => removeProjectSkill(index, skill.id)}
+                          className={styles.skillTagRemove}
+                        >
+                          ×
+                        </button>
                       </span>
                     ))}
                   </div>
+                </>
+              ) : (
+                <div className={styles.skillTags}>
+                  {project.skills.length === 0
+                    ? <span className={styles.muted}>None</span>
+                    : project.skills.map(s => (
+                        <span key={s.id} className={styles.skillTag}>{s.skillName}</span>
+                      ))}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Description</label>
+              {isEditingProjects ? (
+                <textarea
+                  value={project.projectInfo}
+                  onChange={e => handleProjectChange(index, 'projectInfo', e.target.value)}
+                  rows={6}
+                  className={styles.fieldTextarea}
+                  placeholder="Describe the project…"
+                />
+              ) : (
+                <p className={styles.fieldText}>{project.projectInfo || '—'}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ════════════════════════════════════════════
+          SKILLS SECTION
+      ════════════════════════════════════════════ */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.sectionEyebrow}>Section 2 of 2</p>
+            <h2 className={styles.sectionTitle}>Skills</h2>
+          </div>
+        </div>
+
+        <div className={styles.skillsGrid}>
+          {/* ── Category cards ── */}
+          {allCategories.map(category => {
+            const skills = groupedSkills[category] ?? [];
+            const isPending = !groupedSkills[category];
+            return (
+              <div key={category} className={`${styles.categoryCard} ${isPending ? styles.categoryCardEmpty : ''}`}>
+                {/* Card header */}
+                <div className={styles.categoryCardHeader}>
+                  <span className={styles.categoryName}>{category}</span>
+                  <button
+                    onClick={() => setConfirmDeleteCategory({ name: category, count: skills.length })}
+                    className={styles.deleteCategoryBtn}
+                    title="Delete category"
+                    disabled={opLoading}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                      <path d="M10 11v6M14 11v6" />
+                      <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Skill list */}
+                <div className={styles.categoryCardBody}>
+                  {skills.length === 0 && (
+                    <p className={styles.emptyCategoryHint}>
+                      Add your first skill below
+                    </p>
+                  )}
+
+                  {skills.map(skill => (
+                    <div key={skill.id} className={styles.skillRow}>
+                      <span className={styles.skillRowName}>{skill.skillName}</span>
+                      <button
+                        onClick={() => handleDeleteSkill(skill.id)}
+                        className={styles.deleteSkillBtn}
+                        disabled={opLoading}
+                        title="Delete skill"
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                          <path d="M10 11v6M14 11v6" />
+                          <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Inline add-skill form */}
+                  {addingSkillToCategory === category ? (
+                    <div className={styles.addSkillForm}>
+                      <input
+                        type="text"
+                        value={newSkillInput}
+                        onChange={e => setNewSkillInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleAddSkill(category);
+                          if (e.key === 'Escape') {
+                            setAddingSkillToCategory(null);
+                            setNewSkillInput('');
+                          }
+                        }}
+                        placeholder="Skill name…"
+                        className={styles.addSkillInput}
+                        autoFocus
+                        disabled={opLoading}
+                      />
+                      <div className={styles.addSkillFormActions}>
+                        <button
+                          onClick={() => handleAddSkill(category)}
+                          className={styles.addConfirmBtn}
+                          disabled={opLoading || !newSkillInput.trim()}
+                        >
+                          Add
+                        </button>
+                        <button
+                          onClick={() => { setAddingSkillToCategory(null); setNewSkillInput(''); }}
+                          className={styles.addCancelBtn}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setAddingSkillToCategory(category);
+                        setNewSkillInput('');
+                      }}
+                      className={styles.addSkillTrigger}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add skill
+                    </button>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+
+          {/* ── Add category card / form ── */}
+          {addingCategory ? (
+            <div className={styles.addCategoryFormCard}>
+              <p className={styles.addCategoryFormLabel}>New category name</p>
+              <input
+                type="text"
+                value={newCategoryInput}
+                onChange={e => setNewCategoryInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleConfirmNewCategory();
+                  if (e.key === 'Escape') { setAddingCategory(false); setNewCategoryInput(''); }
+                }}
+                placeholder="e.g. Frameworks"
+                className={styles.addCategoryInput}
+                autoFocus
+              />
+              <div className={styles.addCategoryFormActions}>
+                <button
+                  onClick={handleConfirmNewCategory}
+                  className={styles.addConfirmBtn}
+                  disabled={!newCategoryInput.trim()}
+                >
+                  Create
+                </button>
+                <button
+                  onClick={() => { setAddingCategory(false); setNewCategoryInput(''); }}
+                  className={styles.addCancelBtn}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={handleStartAddCategory} className={styles.addCategoryCard}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={styles.addCategoryIcon}>
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span className={styles.addCategoryLabel}>Add Category</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* ── Confirm delete category modal ── */}
+      {confirmDeleteCategory && (
+        <div className={styles.modalOverlay} onClick={() => setConfirmDeleteCategory(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+              </svg>
+            </div>
+            <h4 className={styles.modalTitle}>Delete Category</h4>
+            <p className={styles.modalBody}>
+              Are you sure you want to delete{' '}
+              <strong>"{confirmDeleteCategory.name}"</strong>?
+              {confirmDeleteCategory.count > 0 && (
+                <>
+                  {' '}This will permanently delete{' '}
+                  <strong>
+                    {confirmDeleteCategory.count} skill{confirmDeleteCategory.count !== 1 ? 's' : ''}
+                  </strong>{' '}
+                  from the database.
+                </>
+              )}
+            </p>
+            <p className={styles.modalWarning}>This action cannot be undone.</p>
+            <div className={styles.modalActions}>
+              <button
+                onClick={() => setConfirmDeleteCategory(null)}
+                className={styles.cancelButton}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCategory}
+                className={styles.dangerButton}
+                disabled={opLoading}
+              >
+                {opLoading ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashboard}>
       <h1 className={styles.title}>Dashboard</h1>
-      <p className={styles.subtitle}>Welcome to Resume Analyzer</p>
+      <p className={styles.subtitle}>Welcome to Job Matrix</p>
 
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>

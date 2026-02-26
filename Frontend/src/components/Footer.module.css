@@ -1,86 +1,75 @@
 .footer {
-  background-color: #1a1a1a;
-  border-top: 1px solid #333;
-  padding: 2rem 0;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default);
+  padding: var(--space-6) 0;
   margin-top: auto;
+  transition: background var(--transition-base), border-color var(--transition-base);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: var(--container-2xl);
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 var(--space-8);
 }
 
 .content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  text-align: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.brandName {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: var(--tracking-tight);
 }
 
 .copyright {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
   margin: 0;
 }
 
 .links {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-6);
   align-items: center;
   flex-wrap: wrap;
-  justify-content: center;
 }
 
 .link {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: color var(--transition-fast);
 }
 
-.link:hover {
-  color: #646cff;
-}
+.link:hover { color: var(--color-primary); }
 
-.separator {
-  color: rgba(255, 255, 255, 0.3);
-  user-select: none;
-}
+@media (max-width: 640px) {
+  .container { padding: 0 var(--space-4); }
 
-@media (prefers-color-scheme: light) {
-  .footer {
-    background-color: #f9f9f9;
-    border-top-color: #e0e0e0;
-  }
-
-  .copyright,
-  .link {
-    color: rgba(33, 53, 71, 0.7);
-  }
-
-  .link:hover {
-    color: #646cff;
-  }
-
-  .separator {
-    color: rgba(33, 53, 71, 0.3);
-  }
-}
-
-@media (max-width: 768px) {
   .content {
-    gap: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-3);
   }
 
   .links {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .separator {
-    display: none;
+    gap: var(--space-4);
+    justify-content: center;
   }
 }
-

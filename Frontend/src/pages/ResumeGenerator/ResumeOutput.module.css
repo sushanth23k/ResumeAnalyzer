@@ -1,64 +1,122 @@
+/* ══════════════════════════════════════════════════════════
+   RESUME OUTPUT — Preview & Download
+══════════════════════════════════════════════════════════ */
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  gap: var(--space-6);
 }
 
+/* ── Header ────────────────────────────────────────────── */
 .header {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 0;
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .header h2 {
-  margin: 0 0 0.5rem 0;
-  color: #1e293b;
-  font-size: 1.5rem;
+  margin: 0 0 var(--space-2) 0;
+  color: var(--text-primary);
+  font-size: var(--text-2xl);
+  letter-spacing: -0.03em;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-3);
 }
 
 .header p {
   margin: 0;
-  color: #64748b;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
 }
 
+/* ── Download Buttons ──────────────────────────────────── */
+.downloadButtons {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.downloadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.875rem var(--space-8);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-width: 200px;
+  justify-content: center;
+  box-shadow: var(--shadow-primary);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.downloadButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-primary-lg);
+}
+
+.downloadButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Editor Container ──────────────────────────────────── */
 .editorContainer {
   flex: 1;
-  margin-bottom: 2rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  overflow: auto;
-  background: white; /* White background to match resume */
-  min-height: 500px;
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: white;
+  min-height: 600px;
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition-base);
+}
+
+.editorContainer:focus-within {
+  border-color: var(--color-primary-muted);
+  box-shadow: var(--shadow-lg), 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
 .editor {
-  height: 500px;
+  height: 600px;
 }
 
-/* Resume Preview Styles - All using Times New Roman, 9pt, 1.15 line spacing */
+/* ══════════════════════════════════════════════════════════
+   RESUME PREVIEW — All Times New Roman, 9pt, 1.15 spacing
+   (These styles render the actual resume content, keep them
+    consistent with professional resume formatting)
+══════════════════════════════════════════════════════════ */
+
 .resumePreview {
-  padding: 0.5in; /* Narrow margins */
+  padding: 0.5in;
   font-family: 'Times New Roman', Times, serif;
   font-size: 9pt;
   line-height: 1.15;
   color: #000000;
-  background: white !important; /* Force white background for resume content */
+  background: white !important;
   max-width: 8.5in;
   margin: 0 auto;
   outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow for better visibility */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .resumePreview:focus {
-  outline: 2px solid #667eea;
+  outline: 2px solid #2563EB;
   outline-offset: -2px;
 }
 
-/* Name - Centered, bold, 9pt */
 .resumeName {
   text-align: center;
   margin: 0;
@@ -69,7 +127,6 @@
   line-height: 1.15;
 }
 
-/* Contact Info - Centered, 9pt */
 .resumeContact {
   text-align: center;
   margin: 0;
@@ -84,7 +141,6 @@
   text-decoration: underline;
 }
 
-/* Section Headers - Blue, bold, 9pt with grid line */
 .sectionHeader {
   margin-top: 6pt;
   margin-bottom: 0;
@@ -94,7 +150,7 @@
   font-family: 'Times New Roman', Times, serif;
   font-size: 9pt;
   font-weight: bold;
-  color: #0000FF; /* Blue */
+  color: #0000FF;
   margin: 0;
   padding: 0;
   text-align: left;
@@ -102,17 +158,15 @@
 }
 
 .gridLine {
-  border-bottom: 1px solid #000000; /* Single black line */
+  border-bottom: 1px solid #000000;
   margin-top: 2px;
   margin-bottom: 0;
 }
 
-/* Line space below heading */
 .sectionHeader + * {
   margin-top: 1.15em;
 }
 
-/* Education Entry */
 .educationEntry {
   margin: 0;
   font-family: 'Times New Roman', Times, serif;
@@ -127,10 +181,9 @@
 
 .educationEntry > span:first-child {
   flex: 1;
-  min-width: 0; /* Allow text to wrap if needed */
+  min-width: 0;
 }
 
-/* Job Header */
 .jobHeader {
   margin: 0;
   font-family: 'Times New Roman', Times, serif;
@@ -145,16 +198,14 @@
 
 .jobHeader > span:first-child {
   flex: 1;
-  min-width: 0; /* Allow text to wrap if needed */
+  min-width: 0;
 }
 
-/* Role Name - Purple */
 .roleName {
   font-weight: bold;
-  color: #800080; /* Purple */
+  color: #800080;
 }
 
-/* Date Field - Editable and Movable with spaces */
 .dateField {
   cursor: text;
   min-width: 120px;
@@ -162,47 +213,26 @@
   text-align: right;
   padding: 2px 4px;
   margin-left: auto;
-  flex-shrink: 0; /* Prevent date from shrinking */
+  flex-shrink: 0;
   position: relative;
   user-select: text;
-  white-space: pre-wrap; /* Allow wrapping but preserve spaces */
-  word-spacing: normal;
-  letter-spacing: normal;
+  white-space: pre-wrap;
   font-family: 'Times New Roman', Times, serif;
   font-size: 9pt;
   color: #000000;
   background: transparent;
 }
 
-.dateField:hover {
-  background-color: #f0f0f0;
-  border-radius: 2px;
-}
+.dateField:hover { background-color: #f0f0f0; border-radius: 2px; }
 
 .dateField:focus {
-  outline: 1px solid #667eea;
+  outline: 1px solid #2563EB;
   background-color: #fff;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
-.dateField::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  cursor: ew-resize;
-  background: transparent;
-}
-
-.dateField:hover::before {
-  background: rgba(102, 126, 234, 0.3);
-}
-
-/* Bullet Points - Start from line start with proper spacing */
 .bulletPoint {
-  margin: 0 0 3pt 0; /* No left indent - starts from line start */
+  margin: 0 0 3pt 0;
   font-family: 'Times New Roman', Times, serif;
   font-size: 9pt;
   line-height: 1.15;
@@ -210,17 +240,15 @@
   align-items: flex-start;
 }
 
-/* Bullet Symbol - Normal document bullets */
 .bulletSymbol {
-  font-size: 9pt; /* Same size as text for normal bullets */
+  font-size: 9pt;
   font-weight: normal;
-  margin-right: 0.5em; /* Standard spacing between bullet and text */
+  margin-right: 0.5em;
   display: inline-block;
   vertical-align: baseline;
   color: #000000;
 }
 
-/* Project Name */
 .projectName {
   margin: 0;
   font-family: 'Times New Roman', Times, serif;
@@ -228,96 +256,33 @@
   line-height: 1.15;
 }
 
-/* Bold text */
-.bold {
-  font-weight: bold;
+.bold { font-weight: bold; }
+
+.resumePreview > div { margin-bottom: 3pt; }
+
+/* ── Dark Mode: resume preview always stays white ──────── */
+:global([data-theme="dark"]) .editorContainer {
+  border-color: var(--border-default);
+  background: white;
 }
 
-/* General div spacing */
-.resumePreview > div {
-  margin-bottom: 3pt;
+:global([data-theme="dark"]) .resumePreview {
+  background: white !important;
+  color: #000000 !important;
 }
 
-.downloadButtons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
+:global([data-theme="dark"]) .resumePreview * { color: inherit !important; }
+:global([data-theme="dark"]) .resumePreview .sectionHeader h2 { color: #0000FF !important; }
+:global([data-theme="dark"]) .resumePreview .roleName  { color: #800080 !important; }
+:global([data-theme="dark"]) .resumePreview .linkedinLink { color: #0000EE !important; }
 
-.downloadButton {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  min-width: 200px;
-}
-
-.downloadButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.downloadButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (prefers-color-scheme: dark) {
-  .header h2 {
-    color: rgba(255, 255, 255, 0.87);
-  }
-
-  .header p {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .editorContainer {
-    border-color: #334155;
-    background: white; /* Keep white background even in dark mode */
-  }
-
-  .resumePreview {
-    background: white !important; /* Force white background in dark mode */
-    color: #000000 !important; /* Force black text in dark mode */
-  }
-
-  /* Ensure all text elements maintain proper colors in dark mode */
-  .resumePreview * {
-    color: inherit !important;
-  }
-
-  .resumePreview .sectionHeader h2 {
-    color: #0000FF !important; /* Blue section headers */
-  }
-
-  .resumePreview .roleName {
-    color: #800080 !important; /* Purple role names */
-  }
-
-  .resumePreview .linkedinLink {
-    color: #0000EE !important; /* Blue LinkedIn link */
-  }
-}
-
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .downloadButtons {
-    flex-direction: column;
-  }
+  .downloadButtons { flex-direction: column; }
 
-  .downloadButton {
-    width: 100%;
-  }
+  .downloadButton { width: 100%; min-width: unset; }
 
-  .editorContainer {
-    min-height: 400px;
-  }
+  .editorContainer { min-height: 400px; }
 
-  .editor {
-    height: 400px;
-  }
+  .editor { height: 400px; }
 }

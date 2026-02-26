@@ -159,19 +159,9 @@ const ExperienceGenerator: React.FC<ExperienceGeneratorProps> = ({ onComplete, s
   if (loading) {
     return (
       <div className={styles.generator}>
-        <div className={styles.loading}>Loading experiences...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.generator}>
-        <div className={styles.error}>
-          <p>⚠️ {error}</p>
-          <button onClick={loadExperiences} className={styles.retryButton}>
-            Retry
-          </button>
+        <div className={styles.loadingState}>
+          <span className={styles.loadSpinner} />
+          Loading your experiences…
         </div>
       </div>
     );
@@ -179,9 +169,18 @@ const ExperienceGenerator: React.FC<ExperienceGeneratorProps> = ({ onComplete, s
 
   return (
     <div className={styles.generator}>
+      {/* ── Dismissible Error Banner ── */}
+      {error && (
+        <div className={styles.errorBanner}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} className={styles.errorDismiss} aria-label="Dismiss">✕</button>
+        </div>
+      )}
+
       <div className={styles.header}>
+        <p className={styles.stepEyebrow}>Step 1 of 4</p>
         <h2>🎯 Experience Generator</h2>
-        <p>Generate or skip to continue</p>
+        <p>AI will rewrite your experience bullet points to match the job description. You can also skip this step.</p>
       </div>
 
       <div className={styles.section}>

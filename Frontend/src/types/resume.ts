@@ -1,4 +1,4 @@
-// TypeScript interfaces for Resume Analyzer application
+// TypeScript interfaces for Job Matrix application
 // Note: These types are for backward compatibility with existing components
 // New components should use types from services/api.ts
 
