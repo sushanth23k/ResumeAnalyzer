@@ -38,7 +38,7 @@ services:
       - DB_SSL_REQUIRE=${DB_SSL_REQUIRE:-True}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
       - GROQ_API_KEY=${GROQ_API_KEY}
-      - MODEL_NAME=${MODEL_NAME:-llama3-8b-8192}
+      - MODEL_NAME=${MODEL_NAME:-openai/gpt-oss-120b}
       - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
       - REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:-False}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}

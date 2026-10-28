@@ -7,7 +7,8 @@ import json
 # Load environment variables
 dotenv.load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
-model_name = os.getenv("MODEL_NAME")
+# Falls back to a default if MODEL_NAME is unset/blank in .env
+model_name = os.getenv("MODEL_NAME") or "openai/gpt-oss-120b"
 
 # Initialize Groq client
 client = groq.Client(api_key=groq_api_key)
