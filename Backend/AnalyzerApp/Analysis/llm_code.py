@@ -7,10 +7,39 @@ import json
 # Load environment variables
 dotenv.load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
-model_name = os.getenv("MODEL_NAME")
+# Falls back to a default if MODEL_NAME is unset/blank in .env
+model_name = os.getenv("MODEL_NAME") or "openai/gpt-oss-120b"
 
 # Initialize Groq client
 client = groq.Client(api_key=groq_api_key)
+
+# gpt-oss models spend completion tokens on reasoning first; with a small budget the
+# visible answer can come back empty, so keep reasoning light and the budget generous.
+MAX_COMPLETION_TOKENS = 8192
+LLM_ATTEMPTS = 2
+
+
+def call_llm(messages, temperature):
+    """Call Groq and return non-empty message content, retrying once if the model returns nothing."""
+    last_finish_reason = None
+    for _ in range(LLM_ATTEMPTS):
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model=model_name,
+            temperature=temperature,
+            max_completion_tokens=MAX_COMPLETION_TOKENS,
+            reasoning_effort="low",
+        )
+        choice = chat_completion.choices[0]
+        content = choice.message.content
+        if content and content.strip():
+            return content
+        last_finish_reason = choice.finish_reason
+    raise ValueError(
+        f"The LLM returned an empty response (finish_reason={last_finish_reason}; "
+        f"check MODEL_NAME, GROQ_API_KEY and token limits)"
+        )
+
 
 def parse_json_list(response_content):
     """Parse a JSON list out of an LLM response, with a descriptive error on failure."""
@@ -107,8 +136,8 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
 
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an expert resume writer specializing in ATS optimization and technical resume enhancement."
@@ -118,12 +147,8 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.8,
+            0.8,
         )
-
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
 
 
         return parse_json_list(response_content)
@@ -198,8 +223,8 @@ def generate_enhanced_project_points(job_role, job_description, project_info, ad
     
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an expert resume writer specializing in ATS optimization and technical resume enhancement for projects."
@@ -209,12 +234,8 @@ def generate_enhanced_project_points(job_role, job_description, project_info, ad
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.8,
+            0.8,
         )
-
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
 
         return parse_json_list(response_content)
 
@@ -529,8 +550,8 @@ def generate_optimized_skills_with_research(job_role, job_description, current_s
     
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an ATS optimization specialist. Focus on job description keywords, preserve existing relevant skills, and use specific tool names only. Keep each skill category within 100-120 characters total. Follow cloud platform detection rules and avoid generic terms."
@@ -540,12 +561,8 @@ def generate_optimized_skills_with_research(job_role, job_description, current_s
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.3,
+            0.3,
         )
-
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
 
         return parse_json_list(response_content)
 

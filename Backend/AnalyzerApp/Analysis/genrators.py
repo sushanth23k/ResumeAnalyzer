@@ -50,16 +50,19 @@ def generate_project_output(user_id, job_role, job_description, project_points_c
     try:
         # Get projects from database
         projects_skills_data = _query_df("""
-        SELECT p.*, STRING_AGG(s.skill_name, ', ') as skills FROM project_skills as ps
-        INNER JOIN projects as p ON ps.project_id = p.id
-        INNER JOIN skills as s ON ps.skill_id = s.id
+        SELECT p.*, STRING_AGG(s.skill_name, ', ') as skills FROM projects as p
+        LEFT JOIN project_skills as ps ON ps.project_id = p.id
+        LEFT JOIN skills as s ON ps.skill_id = s.id
         WHERE p.user_id = %s
         GROUP BY p.id
         ORDER BY p.display_order
         """, [user_id])
 
         # Convert projects to input format
-        projects_input = [{"project_id":i["display_order"]+1, "project_name":i["project_name"], "project_description":i["project_info"], "project_skills":i["skills"].split(', ')} for i in projects_skills_data.to_dict(orient="records")]
+        projects_input = [{"project_id":i["display_order"]+1, "project_name":i["project_name"], "project_description":i["project_info"], "project_skills":i["skills"].split(', ') if i["skills"] else []} for i in projects_skills_data.to_dict(orient="records")]
+
+        if not projects_input:
+            raise ValueError("No projects found for this user; add projects before generating")
         
         # Add resume points to projects input
         for i in range(len(projects_input)):
