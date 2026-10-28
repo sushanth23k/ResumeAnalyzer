@@ -13,6 +13,49 @@ model_name = os.getenv("MODEL_NAME") or "openai/gpt-oss-120b"
 # Initialize Groq client
 client = groq.Client(api_key=groq_api_key)
 
+# gpt-oss models spend completion tokens on reasoning first; with a small budget the
+# visible answer can come back empty, so keep reasoning light and the budget generous.
+MAX_COMPLETION_TOKENS = 8192
+LLM_ATTEMPTS = 2
+
+
+def call_llm(messages, temperature):
+    """Call Groq and return non-empty message content, retrying once if the model returns nothing."""
+    last_finish_reason = None
+    for _ in range(LLM_ATTEMPTS):
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model=model_name,
+            temperature=temperature,
+            max_completion_tokens=MAX_COMPLETION_TOKENS,
+            reasoning_effort="low",
+        )
+        choice = chat_completion.choices[0]
+        content = choice.message.content
+        if content and content.strip():
+            return content
+        last_finish_reason = choice.finish_reason
+    raise ValueError(
+        f"The LLM returned an empty response (finish_reason={last_finish_reason}; "
+        f"check MODEL_NAME, GROQ_API_KEY and token limits)"
+        )
+
+
+def parse_json_list(response_content):
+    """Parse a JSON list out of an LLM response, with a descriptive error on failure."""
+    if not response_content or not response_content.strip():
+        raise ValueError("The LLM returned an empty response (check MODEL_NAME, GROQ_API_KEY and token limits)")
+
+    # Drop reasoning blocks some models emit before the answer
+    cleaned = re.sub(r'<think>.*?</think>', '', response_content, flags=re.DOTALL)
+
+    json_match = re.search(r'\[.*\]', cleaned, re.DOTALL)
+    try:
+        return json.loads(json_match.group() if json_match else cleaned)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"The LLM response was not valid JSON ({e}). Response started with: {response_content[:200]!r}")
+
+
 # Generate enhanced work experience points for job application
 def generate_enhanced_experience_points(job_role, job_description, work_experience, additional_instruction=None):
     """
@@ -93,8 +136,8 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
 
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an expert resume writer specializing in ATS optimization and technical resume enhancement."
@@ -104,24 +147,11 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.8,
+            0.8,
         )
 
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
 
-
-        # Extract JSON from response (in case there's additional text)
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            enhanced_experience = json.loads(json_str)
-        else:
-            # Fallback: try to parse entire response as JSON
-            enhanced_experience = json.loads(response_content)
-
-        return enhanced_experience
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating enhanced experience points: {str(e)}")
@@ -193,8 +223,8 @@ def generate_enhanced_project_points(job_role, job_description, project_info, ad
     
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an expert resume writer specializing in ATS optimization and technical resume enhancement for projects."
@@ -204,23 +234,10 @@ def generate_enhanced_project_points(job_role, job_description, project_info, ad
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.8,
+            0.8,
         )
 
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
-
-        # Extract JSON from response (in case there's additional text)
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            enhanced_projects = json.loads(json_str)
-        else:
-            # Fallback: try to parse entire response as JSON
-            enhanced_projects = json.loads(response_content)
-
-        return enhanced_projects
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating enhanced project points: {str(e)}")
@@ -533,8 +550,8 @@ def generate_optimized_skills_with_research(job_role, job_description, current_s
     
     try:
         # Make API call to Groq
-        chat_completion = client.chat.completions.create(
-            messages=[
+        response_content = call_llm(
+            [
                 {
                     "role": "system",
                     "content": "You are an ATS optimization specialist. Focus on job description keywords, preserve existing relevant skills, and use specific tool names only. Keep each skill category within 100-120 characters total. Follow cloud platform detection rules and avoid generic terms."
@@ -544,22 +561,10 @@ def generate_optimized_skills_with_research(job_role, job_description, current_s
                     "content": prompt
                 }
             ],
-            model=model_name,
-            temperature=0.3,
+            0.3,
         )
 
-        # Extract the response
-        response_content = chat_completion.choices[0].message.content
-
-        # Extract JSON from response
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            optimized_skills = json.loads(json_str)
-        else:
-            optimized_skills = json.loads(response_content)
-
-        return optimized_skills
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating optimized skills: {str(e)}")

@@ -39,14 +39,17 @@ def generate_experience_output(user, job_role, job_description, experiences_poin
 def generate_project_output(user, job_role, job_description, project_points_count, additional_instruction):
 
     try:
-        # Get the user's projects (with at least one skill) from database
+        # Get the user's projects (including those without skills) from database
         project_skills = defaultdict(list)
         for ps in ProjectSkills.objects.filter(project__user=user).select_related('skill'):
             project_skills[ps.project_id].append(ps.skill.skill_name)
-        projects = [p for p in Projects.objects.filter(user=user).order_by('display_order') if p.id in project_skills]
+        projects = list(Projects.objects.filter(user=user).order_by('display_order'))
 
         # Convert projects to input format
-        projects_input = [{"project_id":p.display_order+1, "project_name":p.project_name, "project_description":p.project_info, "project_skills":project_skills[p.id]} for p in projects]
+        projects_input = [{"project_id":p.display_order+1, "project_name":p.project_name, "project_description":p.project_info, "project_skills":project_skills.get(p.id, [])} for p in projects]
+
+        if not projects_input:
+            raise ValueError("No projects found for this user; add projects before generating")
         
         # Add resume points to projects input
         for i in range(len(projects_input)):
