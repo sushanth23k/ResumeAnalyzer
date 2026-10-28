@@ -12,6 +12,21 @@ model_name = os.getenv("MODEL_NAME")
 # Initialize Groq client
 client = groq.Client(api_key=groq_api_key)
 
+def parse_json_list(response_content):
+    """Parse a JSON list out of an LLM response, with a descriptive error on failure."""
+    if not response_content or not response_content.strip():
+        raise ValueError("The LLM returned an empty response (check MODEL_NAME, GROQ_API_KEY and token limits)")
+
+    # Drop reasoning blocks some models emit before the answer
+    cleaned = re.sub(r'<think>.*?</think>', '', response_content, flags=re.DOTALL)
+
+    json_match = re.search(r'\[.*\]', cleaned, re.DOTALL)
+    try:
+        return json.loads(json_match.group() if json_match else cleaned)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"The LLM response was not valid JSON ({e}). Response started with: {response_content[:200]!r}")
+
+
 # Generate enhanced work experience points for job application
 def generate_enhanced_experience_points(job_role, job_description, work_experience, additional_instruction=None):
     """
@@ -111,16 +126,7 @@ def generate_enhanced_experience_points(job_role, job_description, work_experien
         response_content = chat_completion.choices[0].message.content
 
 
-        # Extract JSON from response (in case there's additional text)
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            enhanced_experience = json.loads(json_str)
-        else:
-            # Fallback: try to parse entire response as JSON
-            enhanced_experience = json.loads(response_content)
-
-        return enhanced_experience
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating enhanced experience points: {str(e)}")
@@ -210,16 +216,7 @@ def generate_enhanced_project_points(job_role, job_description, project_info, ad
         # Extract the response
         response_content = chat_completion.choices[0].message.content
 
-        # Extract JSON from response (in case there's additional text)
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            enhanced_projects = json.loads(json_str)
-        else:
-            # Fallback: try to parse entire response as JSON
-            enhanced_projects = json.loads(response_content)
-
-        return enhanced_projects
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating enhanced project points: {str(e)}")
@@ -550,15 +547,7 @@ def generate_optimized_skills_with_research(job_role, job_description, current_s
         # Extract the response
         response_content = chat_completion.choices[0].message.content
 
-        # Extract JSON from response
-        json_match = re.search(r'\[.*\]', response_content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-            optimized_skills = json.loads(json_str)
-        else:
-            optimized_skills = json.loads(response_content)
-
-        return optimized_skills
+        return parse_json_list(response_content)
 
     except Exception as e:
         print(f"Error generating optimized skills: {str(e)}")
