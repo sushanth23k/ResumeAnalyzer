@@ -15,6 +15,7 @@ def experience_generation(request):
     try:
         data = request.data
         experience_output = generate_experience_output(
+            request.user.id,
             data.get("job_role"),
             data.get("job_description"),
             data.get("points_count"),
@@ -31,6 +32,7 @@ def project_generation(request):
     try:
         data = request.data
         project_output = generate_project_output(
+            request.user.id,
             data.get("job_role"),
             data.get("job_description"),
             data.get("points_count"),
@@ -47,6 +49,7 @@ def skill_generation(request):
     try:
         data = request.data
         skill_output = generate_skill_output(
+            request.user.id,
             data.get("job_role"),
             data.get("job_description"),
             data.get("additional_instruction"),
